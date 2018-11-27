@@ -1,0 +1,35 @@
+'` variable
+@  assign
+{} value/set
+;  end
+#  input
+~  return
+.  sub
+[] index acess
+:  this
+() group
+
+
+Assign a variable to a value:
+'Variable`@{Value};
+
+Create a method:
+'Method`@{'Variable`@{Value}};
+
+Execute a method:
+'Method`;
+
+Create a method w/input:
+'Method`#'Input`@{'Variable`@'Input`};
+
+Execute a method w/input:
+'Method`#{Value};
+
+MultiLine Method:
+'Method`@{{'Variable`@{Value}},{'Variable2`@{Value2}}};
+
+Array:
+'Variable`@{{Value1},{Value2}};
+
+Element acess:
+'Variable`[0];
