@@ -13,9 +13,8 @@ class Val {
         }else if(newval.contains(",")){
             String[] str = newval.split(",");
             vals = new Val[str.length];
-            for(int i = 0; i < vals.length; i++){
+            for(int i = 0; i < vals.length; i++)
                 vals[i] = new Val(str[i]);
-            }
         }else{
             set(newval);
         }
@@ -39,9 +38,8 @@ class Val {
     }
     public void set(int newval){
         vals = new Val[(int) Math.ceil(Math.log(newval)/Math.log(2))];
-        for (int i = 0; i < vals.length; i++) {
+        for (int i = 0; i < vals.length; i++) 
             vals[i] = new Bit((newval >> i)%2 == 1);
-        }
     }
     public void set(String newval){
         vals = new Val[8*newval.length()];
@@ -65,15 +63,11 @@ class Val {
     };
     int toInt(){
         int ret = 0;
-        for (int i = 0; i < vals.length; i++) {
-            ret += vals[i].toInt() << i;
-        }
+        for (int i = 0; i < vals.length; i++) ret += vals[i].toInt() << i;
         return ret;
     }
     void print(){
-        for(Val v : vals){
-            v.print();
-        }
+        for(Val v : vals) v.print();
         System.out.print(",");
     }
 }

@@ -40,11 +40,8 @@ public class App {
                     if(tempval.vals == null); //do nothing
                     else if(tempval.vals.length == 0) execute("");
                     else if(tempval.vals[0] instanceof Bit)execute(StringTool.toString(tempval));
-                    else{
-                        for(Val v : tempval.vals){
-                            if(v.vals[0] instanceof Bit)execute(StringTool.toString(v));
-                        }
-                    }
+                    else for(Val v : tempval.vals)
+                        if(v.vals[0] instanceof Bit) execute(StringTool.toString(v));
                     return;
                 }
                 temp += c;
@@ -82,9 +79,8 @@ public class App {
                 if(vallevel == 0){
                     if(StringTool.isList(temp)){
                         ArrayList<Val> newval = new ArrayList<Val>();
-                        for(String str : StringTool.splitList(temp)){
+                        for(String str : StringTool.splitList(temp))
                             newval.add(interpret(str));
-                        }
                         ret = new Val();
                         ret.vals = new Val[newval.size()];
                         newval.toArray(ret.vals);
@@ -130,29 +126,22 @@ public class App {
         return ret;
     }
     static Val get(String name){
-        if(contains(new Var(name))){
+        if(contains(new Var(name)))
             return vars.get(indexOf(new Var(name)));
-        }
         return null;
     } 
     static void setadd(Var v){
-        if(contains(v)){
-            vars.set(indexOf(v), v);
-        }else{
-            vars.add(v);
-        }
+        if(contains(v)) vars.set(indexOf(v), v);
+        else vars.add(v);
     }
     static boolean contains(Var v){
-        for (Var var : vars) {
-            if(var.name.equals(v.name))return true;
-        }
+        for (Var var : vars) 
+            if(var.name.equals(v.name)) return true;
         return false;
     }
     static int indexOf(Var v){
-        int i = 0;
-        for (Var var : vars) {
-            if(var.name.equals(v.name))return i;
-            i++;
+        for (int i = 0; i < vars.size(); i++) {
+            if(vars.get(i).name.equals(v.name)) return i;
         }
         return -1;
     }

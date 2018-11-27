@@ -6,8 +6,8 @@ class StringTool {
     static boolean isList(String s){
         int level = 0;
         for(char c : s.toCharArray()){
-            if(c == '{')level++;
-            if(c == '}')level--;
+            if(c == '{') level++;
+            if(c == '}') level--;
             if(level == 0 && c == ',') return true;
         }
         return false;
@@ -17,14 +17,12 @@ class StringTool {
         ArrayList<String> ret = new ArrayList<>();
         String temp = "";
         for(char c : s.toCharArray()){
-            if(c == '{')level++;
-            if(c == '}')level--;
+            if(c == '{') level++;
+            if(c == '}') level--;
             if(level == 0 && c == ','){
                 ret.add(temp);
                 temp = "";
-            }else{
-                temp += c;
-            }
+            }else temp += c;
         }
         ret.add(temp);
         return ret;
