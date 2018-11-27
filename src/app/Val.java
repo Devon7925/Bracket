@@ -2,7 +2,6 @@ package app;
 
 class Val {
     Val[] vals;
-    boolean interp = false;
     public Val(){}
     public Val(String newval){
         if(newval.equals("1")){

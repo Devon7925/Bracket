@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class App {
     static ArrayList<Var> vars = new ArrayList<>();
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 		String[] s = null;
 		try {
 			s = readFile("src/app/test.bcrt").split(";");
@@ -15,18 +15,16 @@ public class App {
 			e.printStackTrace();
         }
         for(String str : s) {
-            str = str.trim()+";";
-            System.out.println(str);
+            System.out.println(str.trim()+";");
             execute(str);
         }
-        System.out.println("");
         for(Var v : vars){
-            System.out.print(v.name+" - ");
+            System.out.print('\n'+v.name+" - ");
             v.print();
-            System.out.println("");
         }
     }
     static void execute(String s){
+        s = s.trim()+";";
         int mode = 0;
         String temp = "";
         Val tempval = null;
@@ -38,27 +36,24 @@ public class App {
                     mode = 1;//set var
                     break;
                 }else if(c == ';'){
-                    tempval = new Var(temp);
-                    Val val = interpret(temp);
-                    if(val.vals.length == 0) execute("");
-                    else if(val.vals[0].interp) execute(StringTool.toString(val)+";");
+                    tempval = interpret(temp);
+                    if(tempval.vals == null); //do nothing
+                    else if(tempval.vals.length == 0) execute("");
+                    else if(tempval.vals[0] instanceof Bit)execute(StringTool.toString(tempval));
                     else{
-                        for(Val v : val.vals){
-                            if(v.vals[0].interp) execute(StringTool.toString(v)+";");
+                        for(Val v : tempval.vals){
+                            if(v.vals[0] instanceof Bit)execute(StringTool.toString(v));
                         }
                     }
-                    temp = "";
-                    break;
+                    return;
                 }
                 temp += c;
             break;
-            case 1:
+            case 1://assign to value
                 if(c == ';'){
                     tempval.set(interpret(temp));
                     if(tempval instanceof Var) setadd((Var) tempval);
-                    tempval = null;
-                    mode = 0;//done
-                    break;
+                    return;
                 }
                 temp += c;
             break;
@@ -163,10 +158,9 @@ public class App {
     }
 	private static String readFile(String file) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(file));
-		String         line = null;
-		StringBuilder  stringBuilder = new StringBuilder();
-		String         ls = System.getProperty("line.separator");
-	
+		String line = null;
+		StringBuilder stringBuilder = new StringBuilder();
+		String ls = System.getProperty("line.separator");
 		try {
 			while((line = reader.readLine()) != null) {
 				stringBuilder.append(line);

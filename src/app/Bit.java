@@ -4,7 +4,6 @@ class Bit extends Val {
     boolean b;
     Bit(boolean b){
         this.b = b;
-        interp = true;
     }
     int toInt(){
         return b?1:0;
