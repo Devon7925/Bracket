@@ -29,28 +29,17 @@ public class App {
     static void execute(String s){
         int mode = 0;
         String temp = "";
-        Var tempvar = null;
+        Val tempval = null;
         for(char c : s.toCharArray()) switch(mode){
-            case 0://base
-            if(c == '\'')
-                mode = 1;//read var name
-            break;
-            case 1://read var name
-                if(c == '`'){
-                    tempvar = new Var(temp);
-                    temp = "";
-                    mode = 2;//check what to do with var
-                    break;
-                }
-                temp += c;
-            break;
-            case 2://check what to do with var
+            case 0://check what to do with var
                 if(c == '@'){
+                    tempval = interpret(temp);
                     temp = "";
-                    mode = 3;//set var
+                    mode = 1;//set var
                     break;
                 }else if(c == ';'){
-                    Val val = interpret("\'"+tempvar.name+"`"+temp);
+                    tempval = new Var(temp);
+                    Val val = interpret(temp);
                     if(val.vals.length == 0) execute("");
                     else if(val.vals[0].interp) execute(StringTool.toString(val)+";");
                     else{
@@ -59,16 +48,15 @@ public class App {
                         }
                     }
                     temp = "";
-                    mode = 0;
                     break;
                 }
                 temp += c;
             break;
-            case 3:
+            case 1:
                 if(c == ';'){
-                    tempvar.set(interpret(temp));
-                    setadd(tempvar);
-                    tempvar = null;
+                    tempval.set(interpret(temp));
+                    if(tempval instanceof Var) setadd((Var) tempval);
+                    tempval = null;
                     mode = 0;//done
                     break;
                 }
@@ -117,6 +105,7 @@ public class App {
             case 2: //Variable
                 if(c == '`'){
                     ret = get(temp);
+                    if(ret == null) ret = new Var(temp);
                     temp = "";
                     mode = 3;
                     break;
@@ -149,7 +138,7 @@ public class App {
         if(contains(new Var(name))){
             return vars.get(indexOf(new Var(name)));
         }
-        return new Bit(false);
+        return null;
     } 
     static void setadd(Var v){
         if(contains(v)){
