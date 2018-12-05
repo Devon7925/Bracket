@@ -2,12 +2,13 @@
 @  assign
 {} value/set
 ;  end
-#  input
-~  return
-.  sub
 [] index acess
-:  this
+
+In future:
+~  return
 () group
+.  sub
+:  this
 
 
 Assign a variable to a value:
@@ -19,12 +20,6 @@ Create a method:
 Execute a method:
 'Method`;
 
-Create a method w/input:
-'Method`#'Input`@{'Variable`@'Input`};
-
-Execute a method w/input:
-'Method`#{Value};
-
 MultiLine Method:
 'Method`@{{'Variable`@{Value}},{'Variable2`@{Value2}}};
 
@@ -33,3 +28,10 @@ Array:
 
 Element acess:
 'Variable`[0];
+
+Define operator:
+'&`@{
+    {'result`@{1}},
+    {{'result`@{0}}if'not`['a`]},
+    {{'result`@{0}}if'not`['b`]}
+};  

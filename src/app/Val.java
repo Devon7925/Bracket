@@ -10,11 +10,6 @@ class Val {
             set(false);
         }else if(newval.matches("\\d+")){
             set(Integer.parseInt(newval));
-        }else if(newval.contains(",")){
-            String[] str = newval.split(",");
-            vals = new Val[str.length];
-            for(int i = 0; i < vals.length; i++)
-                vals[i] = new Val(str[i]);
         }else{
             set(newval);
         }
@@ -67,7 +62,7 @@ class Val {
         return ret;
     }
     void print(){
-        for(Val v : vals) v.print();
+        if(vals != null) for(Val v : vals) v.print();
         System.out.print(",");
     }
 }

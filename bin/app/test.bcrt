@@ -1,7 +1,25 @@
 'not`@{{1},{0}};
-'if`@{{},{'result`@{0}}};
-'a`@{1};
-'b`@{0};
-'result`@{1};
-'if`['not`['a`]];
-'if`['not`['b`]];
+'if`@{{{},'a`}['b`]};
+'&`@{
+    {'result`@{1}},
+    {{'result`@{0}}if'not`['a`]},
+    {{'result`@{0}}if'not`['b`]}
+};
+'|`@{
+    {'result`@{0}},
+    {{'result`@{1}}if'a`},
+    {{'result`@{1}}if'b`}
+};
+'^`@{
+    {'result`@{0}},
+    {{'result`@'not`['result`]}if'a`},
+    {{'result`@'not`['result`]}if'b`}
+};
+'+`@{
+    {'res`@{{0},{0}}},
+    {'a`^'b`},
+    {'res`[0]@'result`},
+    {'a`&'b`},
+    {'res`[1]@'result`}
+};
+{1}+{0};

@@ -28,20 +28,31 @@ public class App {
         int mode = 0;
         String temp = "";
         Val tempval = null;
+        int vallevel = 0;
         for(char c : s.toCharArray()) switch(mode){
             case 0://check what to do with var
-                if(c == '@'){
+                if(c == '{')vallevel++;
+                if(c == '}')vallevel--;
+                if(vallevel == 0 && c == '@'){
                     tempval = interpret(temp);
                     temp = "";
                     mode = 1;//set var
                     break;
                 }else if(c == ';'){
+                    int size = vars.size();
                     tempval = interpret(temp);
                     if(tempval.vals == null); //do nothing
                     else if(tempval.vals.length == 0) execute("");
-                    else if(tempval.vals[0] instanceof Bit)execute(StringTool.toString(tempval));
-                    else for(Val v : tempval.vals)
-                        if(v.vals[0] instanceof Bit) execute(StringTool.toString(v));
+                    else if(tempval.vals[0] instanceof Bit){
+                        execute(StringTool.toString(tempval));
+                    }else {
+                        for(Val v : tempval.vals)
+                            if(v.vals[0] instanceof Bit) execute(StringTool.toString(v));
+                    }
+                    if(size != vars.size()){
+                        vars.remove(0);
+                        vars.remove(0);
+                    }
                     return;
                 }
                 temp += c;
@@ -57,11 +68,13 @@ public class App {
         }
     }
     static Val interpret(String s){
+        s += ";";
         Val ret = new Val();
         int mode = 0;
         int vallevel = 0;
         int indexlevel = 0;
         String temp = "";
+        String op = "";
         for(char c : s.toCharArray()) switch(mode){
             case 0://start
                 if(c == '{'){
@@ -106,8 +119,11 @@ public class App {
             case 3://read what to do with value or Variable
                 if(c == '['){
                     indexlevel = 1;
+                    temp = "";
                     mode = 4;
-                    break;
+                }else{
+                    temp = ""+c;
+                    mode = 5;
                 }
             break;
             case 4: //end index acess
@@ -119,6 +135,26 @@ public class App {
                 temp = "";
                 mode = 3;
                 break;
+            }
+            temp += c;
+            break;
+            case 5:
+            if(c == '{' || c == '\''){
+                mode = 6;
+                op = temp;
+                temp = "";
+            }
+            temp += c;
+            break;
+            case 6:
+            if(c == ';'){
+                Var a = new Var("a");
+                Var b = new Var("b");
+                a.set(ret);
+                b.set(interpret(temp));
+                vars.add(0, a);
+                vars.add(0, b);
+                ret = get(op);
             }
             temp += c;
             break;
