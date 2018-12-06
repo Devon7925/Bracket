@@ -5,4 +5,8 @@ class Var extends Val{
     public Var(String name){
         this.name = name;
     }
+    void print(){
+        System.out.print('\n'+name+" - ");
+        super.print();
+    }
 }

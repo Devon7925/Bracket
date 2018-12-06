@@ -8,31 +8,26 @@ import java.util.ArrayList;
 public class App {
     static ArrayList<Var> vars = new ArrayList<>();
     public static void main(String[] args) {
-		String[] s = null;
+		String[] lines = null;
 		try {
-			s = readFile("src/app/test.bcrt").split(";");
+			lines = readFile("src/app/test.bcrt").split(";");
 		} catch (Exception e) {
 			e.printStackTrace();
         }
-        for(String str : s) {
-            System.out.println(str.trim()+";");
-            execute(str);
-        }
-        for(Var v : vars){
-            System.out.print('\n'+v.name+" - ");
-            v.print();
-        }
+        for(String line : lines) execute(line);
+        vars.forEach(v -> v.print());
     }
     static void execute(String s){
         s = s.trim()+";";
+        System.out.println(s);
         int mode = 0;
         String temp = "";
         Val tempval = null;
         int vallevel = 0;
         for(char c : s.toCharArray()) switch(mode){
             case 0://check what to do with var
-                if(c == '{')vallevel++;
-                if(c == '}')vallevel--;
+                if(c == '{') vallevel++;
+                if(c == '}') vallevel--;
                 if(vallevel == 0 && c == '@'){
                     tempval = interpret(temp);
                     temp = "";
@@ -42,13 +37,9 @@ public class App {
                     int size = vars.size();
                     tempval = interpret(temp);
                     if(tempval.vals == null); //do nothing
-                    else if(tempval.vals.length == 0) execute("");
-                    else if(tempval.vals[0] instanceof Bit){
-                        execute(StringTool.toString(tempval));
-                    }else {
-                        for(Val v : tempval.vals)
-                            if(v.vals[0] instanceof Bit) execute(StringTool.toString(v));
-                    }
+                    else if(tempval.vals.length == 0); //do nothing
+                    else if(tempval.vals[0] instanceof Bit) execute(tempval);
+                    else for(Val v : tempval.vals) if(v.vals[0] instanceof Bit) execute(v);
                     if(size != vars.size()){
                         vars.remove(0);
                         vars.remove(0);
@@ -67,6 +58,9 @@ public class App {
             break;
         }
     }
+    static void execute(Val v){
+        execute(StringTool.toString(v));
+    }
     static Val interpret(String s){
         s += ";";
         Val ret = new Val();
@@ -75,89 +69,88 @@ public class App {
         int indexlevel = 0;
         String temp = "";
         String op = "";
-        for(char c : s.toCharArray()) switch(mode){
-            case 0://start
-                if(c == '{'){
-                    vallevel = 1;
-                    mode = 1;
-                    break;
-                }else if(c == '\''){
-                    mode = 2;
-                    break;
-                }
-            break;
-            case 1://value or array
-                if(c == '{') vallevel++;
-                if(c == '}') vallevel--;
-                if(vallevel == 0){
-                    if(StringTool.isList(temp)){
-                        ArrayList<Val> newval = new ArrayList<Val>();
-                        for(String str : StringTool.splitList(temp))
-                            newval.add(interpret(str));
-                        ret = new Val();
-                        ret.vals = new Val[newval.size()];
-                        newval.toArray(ret.vals);
-                    }else{
-                        ret = new Val(temp);
+        for(char c : s.toCharArray()){
+            if(c == '{') vallevel++;
+            else if(c == '}') vallevel--;
+            else if(c == '[') indexlevel++;
+            else if(c == ']') indexlevel--;
+            switch(mode){
+                case 0://start
+                    if(c == '{'){
+                        mode = 1;
+                        break;
+                    }else if(c == '\''){
+                        mode = 2;
+                        break;
                     }
-                    temp = "";
-                    vallevel = 0;
-                    mode = 3;
-                }
-                temp += c;
-            break;
-            case 2: //Variable
-                if(c == '`'){
-                    ret = get(temp);
-                    if(ret == null) ret = new Var(temp);
+                break;
+                case 1://value or array
+                    if(vallevel == 0){
+                        if(StringTool.isList(temp)){
+                            ArrayList<Val> newval = new ArrayList<Val>();
+                            for(String str : StringTool.splitList(temp))
+                                newval.add(interpret(str));
+                            ret = new Val();
+                            ret.vals = new Val[newval.size()];
+                            newval.toArray(ret.vals);
+                        }else{
+                            ret = new Val(temp);
+                        }
+                        temp = "";
+                        mode = 3;
+                    }
+                    temp += c;
+                break;
+                case 2: //Variable
+                    if(c == '`'){
+                        ret = get(temp);
+                        if(ret == null) ret = new Var(temp);
+                        temp = "";
+                        mode = 3;
+                        break;
+                    }
+                    temp += c;
+                break;
+                case 3://read what to do with value or Variable
+                    if(c == '['){
+                        temp = "";
+                        mode = 4;
+                    }else{
+                        temp = ""+c;
+                        mode = 5;
+                    }
+                break;
+                case 4: //end index acess
+                if(indexlevel == 0){
+                    if(temp.matches("\\d+")) ret = ret.vals[Integer.parseInt(temp)];
+                    else ret = ret.vals[interpret(temp).toInt()];
                     temp = "";
                     mode = 3;
                     break;
                 }
                 temp += c;
-            break;
-            case 3://read what to do with value or Variable
-                if(c == '['){
-                    indexlevel = 1;
+                break;
+                case 5:
+                if(c == '{' || c == '\''){
+                    mode = 6;
+                    op = temp;
                     temp = "";
-                    mode = 4;
-                }else{
-                    temp = ""+c;
-                    mode = 5;
                 }
-            break;
-            case 4: //end index acess
-            if(c == '[') indexlevel++;
-            if(c == ']') indexlevel--;
-            if(indexlevel == 0){
-                if(temp.matches("\\d+")) ret = ret.vals[Integer.parseInt(temp)];
-                else ret = ret.vals[interpret(temp).toInt()];
-                temp = "";
-                mode = 3;
+                temp += c;
+                break;
+                case 6:
+                if(c == ';'){
+                    Var a = new Var("a");
+                    Var b = new Var("b");
+                    a.set(ret);
+                    b.set(interpret(temp));
+                    vars.add(0, a);
+                    vars.add(0, b);
+                    ret = get(op);
+                }
+                temp += c;
                 break;
             }
-            temp += c;
-            break;
-            case 5:
-            if(c == '{' || c == '\''){
-                mode = 6;
-                op = temp;
-                temp = "";
-            }
-            temp += c;
-            break;
-            case 6:
-            if(c == ';'){
-                Var a = new Var("a");
-                Var b = new Var("b");
-                a.set(ret);
-                b.set(interpret(temp));
-                vars.add(0, a);
-                vars.add(0, b);
-                ret = get(op);
-            }
-            temp += c;
-            break;
         }
         return ret;
     }
@@ -176,9 +169,8 @@ public class App {
         return false;
     }
     static int indexOf(Var v){
-        for (int i = 0; i < vars.size(); i++) {
+        for (int i = 0; i < vars.size(); i++)
             if(vars.get(i).name.equals(v.name)) return i;
-        }
         return -1;
     }
 	private static String readFile(String file) throws IOException {
