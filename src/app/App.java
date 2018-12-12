@@ -17,7 +17,7 @@ public class App {
         for(String line : lines) execute(line);
         vars.forEach(v -> v.print());
     }
-    static void execute(String s){
+    static Val execute(String s){
         s = s.trim()+";";
         System.out.println(s);
         int mode = 0;
@@ -28,23 +28,25 @@ public class App {
             case 0://check what to do with var
                 if(c == '{') vallevel++;
                 if(c == '}') vallevel--;
-                if(vallevel == 0 && c == '@'){
-                    tempval = interpret(temp);
-                    temp = "";
-                    mode = 1;//set var
-                    break;
-                }else if(c == ';'){
-                    int size = vars.size();
-                    tempval = interpret(temp);
-                    if(tempval.vals == null); //do nothing
-                    else if(tempval.vals.length == 0); //do nothing
-                    else if(tempval.vals[0] instanceof Bit) execute(tempval);
-                    else for(Val v : tempval.vals) if(v.vals[0] instanceof Bit) execute(v);
-                    if(size != vars.size()){
-                        vars.remove(0);
-                        vars.remove(0);
+                if(vallevel == 0) {
+                    if(c == '@'){
+                        tempval = interpret(temp);
+                        temp = "";
+                        mode = 1;//set var
+                        break;
+                    }else if(c == ';'){
+                        tempval = interpret(temp);
+                        Val ret = null;
+                        if(tempval == null);//do nothing
+                        else if(tempval.vals == null); //do nothing
+                        else if(tempval.vals.length == 0); //do nothing
+                        else ret = execute(tempval);
+                        if(ret != null) return ret;
+                    }else if(c == '~'){
+                        temp = "";
+                        mode = 2;
+                        break;
                     }
-                    return;
                 }
                 temp += c;
             break;
@@ -52,21 +54,35 @@ public class App {
                 if(c == ';'){
                     tempval.set(interpret(temp));
                     if(tempval instanceof Var) setadd((Var) tempval);
-                    return;
+                    return null;
                 }
                 temp += c;
             break;
+            case 2:
+            if(c == ';'){
+                return new Val(interpret(temp));
+            }
+            temp += c;
+            break;
         }
+        return null;
     }
-    static void execute(Val v){
-        execute(StringTool.toString(v));
+    static Val execute(Val v){
+        Val ret = null;
+        if(v.vals[0] instanceof Bit) return execute(StringTool.toString(v));
+        else for(Val v1 : v.vals) if(v1.vals[0] instanceof Bit) {
+            Val toret = execute(v1);
+            if(toret != null) ret = toret;
+        }
+        return ret;
     }
     static Val interpret(String s){
         s += ";";
         Val ret = new Val();
         int mode = 0;
-        int vallevel = 0;
-        int indexlevel = 0;
+        int vallevel = 0,
+          indexlevel = 0,
+          parenlevel = 0;
         String temp = "";
         String op = "";
         for(char c : s.toCharArray()){
@@ -74,15 +90,13 @@ public class App {
             else if(c == '}') vallevel--;
             else if(c == '[') indexlevel++;
             else if(c == ']') indexlevel--;
+            else if(c == '(') parenlevel++;
+            else if(c == ')') parenlevel--;
             switch(mode){
                 case 0://start
-                    if(c == '{'){
-                        mode = 1;
-                        break;
-                    }else if(c == '\''){
-                        mode = 2;
-                        break;
-                    }
+                    if(c == '{') mode = 1;
+                    else if(c == '\'') mode = 2;
+                    else if(c == '(')  mode = 7;
                 break;
                 case 1://value or array
                     if(vallevel == 0){
@@ -130,7 +144,7 @@ public class App {
                 }
                 temp += c;
                 break;
-                case 5:
+                case 5://read operation
                 if(c == '{' || c == '\''){
                     mode = 6;
                     op = temp;
@@ -138,7 +152,7 @@ public class App {
                 }
                 temp += c;
                 break;
-                case 6:
+                case 6://read second input to operation
                 if(c == ';'){
                     Var a = new Var("a");
                     Var b = new Var("b");
@@ -146,7 +160,17 @@ public class App {
                     b.set(interpret(temp));
                     vars.add(0, a);
                     vars.add(0, b);
-                    ret = get(op);
+                    ret = execute(get(op));
+                    vars.remove(0);
+                    vars.remove(0);
+                }
+                temp += c;
+                break;
+                case 7:
+                if(parenlevel == 0){
+                    ret = interpret(temp);
+                    temp = "";
+                    mode = 3;
                 }
                 temp += c;
                 break;

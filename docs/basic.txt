@@ -3,10 +3,10 @@
 {} value/set
 ;  end
 [] index acess
-
-In future:
 ~  return
 () group
+
+In future:
 .  sub
 :  this
 
@@ -31,7 +31,9 @@ Element acess:
 
 Define operator:
 '&`@{
-    {'result`@{1}},
-    {{'result`@{0}}if'not`['a`]},
-    {{'result`@{0}}if'not`['b`]}
-};  
+    {'res`@{1}},
+    {{'res`@{0}}if'not`['a`]},
+    {{'res`@{0}}if'not`['b`]},
+    {~'res`}
+};
+note: ~/return is used here, it is only used for operations because of technical reasons

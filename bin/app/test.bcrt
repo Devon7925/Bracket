@@ -1,25 +1,24 @@
 'not`@{{1},{0}};
 'if`@{{{},'a`}['b`]};
 '&`@{
-    {'result`@{1}},
-    {{'result`@{0}}if'not`['a`]},
-    {{'result`@{0}}if'not`['b`]}
+    {'res`@{1}},
+    {{'res`@{0}}if'not`['a`]},
+    {{'res`@{0}}if'not`['b`]},
+    {~'res`}
 };
 '|`@{
-    {'result`@{0}},
-    {{'result`@{1}}if'a`},
-    {{'result`@{1}}if'b`}
+    {'res`@{0}},
+    {{'res`@{1}}if'a`},
+    {{'res`@{1}}if'b`},
+    {~'res`}
+
 };
 '^`@{
-    {'result`@{0}},
-    {{'result`@'not`['result`]}if'a`},
-    {{'result`@'not`['result`]}if'b`}
+    {'res`@{0}},
+    {{'res`@'not`['res`]}if'a`},
+    {{'res`@'not`['res`]}if'b`},
+    {~'res`}
 };
-'+`@{
-    {'res`@{{0},{0}}},
-    {'a`^'b`},
-    {'res`[0]@'result`},
-    {'a`&'b`},
-    {'res`[1]@'result`}
-};
-{0}+{0};
+'+`@{~{'a`^'b`,'a`&'b`}};
+'t`@({1}^{0})|{1};
+'t2`@{1}+{1};
