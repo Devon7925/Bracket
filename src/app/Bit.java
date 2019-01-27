@@ -8,7 +8,17 @@ class Bit extends Val {
     int toInt(){
         return b?1:0;
     }
+    public void set(Val newval){
+        if(newval instanceof Bit) {
+            b = ((Bit) newval).b;
+            return;
+        }
+        this.b = ((Bit) newval.vals.get(0)).b;
+    }
+    public String toString(){
+        return (b?"T":"F")+",";
+    }
     void print(){
-        System.out.print((b?"T":"F")+",");
+        System.out.print(toString());
     }
 }

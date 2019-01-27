@@ -29,10 +29,10 @@ class StringTool {
     }
     static String toString(Val val){
         String ret = "";
-        for (int i = 0; i < val.vals.length; i+=8) {
+        for (int i = 0; i < val.vals.size(); i+=8) {
             int ch = 0;
             for(int j = 0; j < 8; j++)
-                ch += val.vals[i+j].toInt() << j;
+                ch += val.vals.get(i+j).toInt() << j;
             ret += (char) ch;
         }
         return ret;

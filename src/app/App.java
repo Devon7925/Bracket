@@ -19,7 +19,7 @@ public class App {
     }
     static Val execute(String s){
         s = s.trim()+";";
-        System.out.println(s);
+        //System.out.println(s);
         int mode = 0;
         String temp = "";
         Val tempval = null;
@@ -39,7 +39,7 @@ public class App {
                         Val ret = null;
                         if(tempval == null);//do nothing
                         else if(tempval.vals == null); //do nothing
-                        else if(tempval.vals.length == 0); //do nothing
+                        else if(tempval.vals.size() == 0); //do nothing
                         else ret = execute(tempval);
                         if(ret != null) return ret;
                     }else if(c == '~'){
@@ -53,7 +53,7 @@ public class App {
             case 1://assign to value
                 if(c == ';'){
                     tempval.set(interpret(temp));
-                    if(tempval instanceof Var) setadd((Var) tempval);
+                    if(tempval instanceof Var && ((Var) tempval).holder == null) setadd((Var) tempval);
                     return null;
                 }
                 temp += c;
@@ -69,8 +69,8 @@ public class App {
     }
     static Val execute(Val v){
         Val ret = null;
-        if(v.vals[0] instanceof Bit) return execute(StringTool.toString(v));
-        else for(Val v1 : v.vals) if(v1.vals[0] instanceof Bit) {
+        if(v.vals.get(0) instanceof Bit) return execute(StringTool.toString(v));
+        else for(Val v1 : v.vals) if(v1.vals.get(0) instanceof Bit) {
             Val toret = execute(v1);
             if(toret != null) ret = toret;
         }
@@ -105,8 +105,8 @@ public class App {
                             for(String str : StringTool.splitList(temp))
                                 newval.add(interpret(str));
                             ret = new Val();
-                            ret.vals = new Val[newval.size()];
-                            newval.toArray(ret.vals);
+                            ret.vals = new ArrayList<Val>(newval.size());
+                            ret.vals = newval;
                         }else{
                             ret = new Val(temp);
                         }
@@ -129,15 +129,30 @@ public class App {
                     if(c == '['){
                         temp = "";
                         mode = 4;
-                    }else{
+                    }else if(c == '.'){
+                        temp = "";
+                        mode = 8;
+                    }else if(c == '_'){
+                        int sum = 0;
+                        for(int i = 0; i < ret.vals.size(); i++){
+                            sum += ret.vals.get(i).vals.size();
+                        }
+                        ArrayList<Val> flatvals = new ArrayList<Val>(sum);
+                        for(int i = 0; i < ret.vals.size(); i++){
+                            for(int j = 0; j < ret.vals.get(i).vals.size(); j++){
+                                flatvals.add(ret.vals.get(i).vals.get(j));
+                            }
+                        }
+                        ret.vals = flatvals;
+                    } else{
                         temp = ""+c;
                         mode = 5;
                     }
                 break;
                 case 4: //end index acess
                 if(indexlevel == 0){
-                    if(temp.matches("\\d+")) ret = ret.vals[Integer.parseInt(temp)];
-                    else ret = ret.vals[interpret(temp).toInt()];
+                    if(temp.matches("\\d+")) ret = ret.get(Integer.parseInt(temp));
+                    else ret = ret.get(interpret(temp).toInt());
                     temp = "";
                     mode = 3;
                     break;
@@ -145,7 +160,7 @@ public class App {
                 temp += c;
                 break;
                 case 5://read operation
-                if(c == '{' || c == '\''){
+                if(c == '{' || c == '\'' || c == '('){
                     mode = 6;
                     op = temp;
                     temp = "";
@@ -158,9 +173,10 @@ public class App {
                     Var b = new Var("b");
                     a.set(ret);
                     b.set(interpret(temp));
+                    Val v = get(op);
                     vars.add(0, a);
                     vars.add(0, b);
-                    ret = execute(get(op));
+                    ret = execute(v);
                     vars.remove(0);
                     vars.remove(0);
                 }
@@ -174,27 +190,33 @@ public class App {
                 }
                 temp += c;
                 break;
+                case 8:
+                if(c == ';'){
+                    ret = ((Var) ret).get(interpret(temp).toString());
+                }
+                temp += c;
+                break;
             }
         }
         return ret;
     }
     static Val get(String name){
-        if(contains(new Var(name)))
-            return vars.get(indexOf(new Var(name)));
+        if(contains(name))
+            return vars.get(indexOf(name));
         return null;
     } 
     static void setadd(Var v){
-        if(contains(v)) vars.set(indexOf(v), v);
+        if(contains(v.name)) vars.set(indexOf(v.name), v);
         else vars.add(v);
     }
-    static boolean contains(Var v){
+    static boolean contains(String v){
         for (Var var : vars) 
-            if(var.name.equals(v.name)) return true;
+            if(var.name.equals(v)) return true;
         return false;
     }
-    static int indexOf(Var v){
+    static int indexOf(String v){
         for (int i = 0; i < vars.size(); i++)
-            if(vars.get(i).name.equals(v.name)) return i;
+            if(vars.get(i).name.equals(v)) return i;
         return -1;
     }
 	private static String readFile(String file) throws IOException {
@@ -207,7 +229,7 @@ public class App {
 				stringBuilder.append(line);
 				stringBuilder.append(ls);
 			}
-			stringBuilder.delete(stringBuilder.lastIndexOf(ls), stringBuilder.length()) ;
+			stringBuilder.delete(stringBuilder.lastIndexOf(ls), stringBuilder.length());
 			return stringBuilder.toString();
 		} finally {
 			reader.close();
