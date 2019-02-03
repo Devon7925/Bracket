@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class App {
+
     static ArrayList<Var> vars = new ArrayList<>();
+
     public static void main(String[] args) {
 		String[] lines = null;
 		try {
@@ -17,9 +19,10 @@ public class App {
         for(String line : lines) execute(line);
         vars.forEach(v -> v.print());
     }
+
     static Val execute(String s){
         s = s.trim()+";";
-        //System.out.println(s);
+        // System.out.println(s);
         int mode = 0;
         String temp = "";
         Val tempval = null;
@@ -59,14 +62,15 @@ public class App {
                 temp += c;
             break;
             case 2:
-            if(c == ';'){
-                return new Val(interpret(temp));
-            }
-            temp += c;
+                if(c == ';'){
+                    return new Val(interpret(temp));
+                }
+                temp += c;
             break;
         }
         return null;
     }
+    
     static Val execute(Val v){
         Val ret = null;
         if(v.vals.get(0) instanceof Bit) return execute(StringTool.toString(v));
@@ -76,6 +80,7 @@ public class App {
         }
         return ret;
     }
+
     static Val interpret(String s){
         s += ";";
         Val ret = new Val();
@@ -105,7 +110,6 @@ public class App {
                             for(String str : StringTool.splitList(temp))
                                 newval.add(interpret(str));
                             ret = new Val();
-                            ret.vals = new ArrayList<Val>(newval.size());
                             ret.vals = newval;
                         }else{
                             ret = new Val(temp);
@@ -144,81 +148,86 @@ public class App {
                             }
                         }
                         ret.vals = flatvals;
-                    } else{
+                    }else{
                         temp = ""+c;
                         mode = 5;
                     }
                 break;
                 case 4: //end index acess
-                if(indexlevel == 0){
-                    if(temp.matches("\\d+")) ret = ret.get(Integer.parseInt(temp));
-                    else ret = ret.get(interpret(temp).toInt());
-                    temp = "";
-                    mode = 3;
-                    break;
-                }
-                temp += c;
+                    if(indexlevel == 0){
+                        if(temp.matches("\\d+")) ret = ret.get(Integer.parseInt(temp));
+                        else ret = ret.get(interpret(temp).toInt());
+                        temp = "";
+                        mode = 3;
+                        break;
+                    }
+                    temp += c;
                 break;
                 case 5://read operation
-                if(c == '{' || c == '\'' || c == '('){
-                    mode = 6;
-                    op = temp;
-                    temp = "";
-                }
-                temp += c;
+                    if(c == '{' || c == '\'' || c == '('){
+                        mode = 6;
+                        op = temp;
+                        temp = "";
+                    }
+                    temp += c;
                 break;
                 case 6://read second input to operation
-                if(c == ';'){
-                    Var a = new Var("a");
-                    Var b = new Var("b");
-                    a.set(ret);
-                    b.set(interpret(temp));
-                    Val v = get(op);
-                    vars.add(0, a);
-                    vars.add(0, b);
-                    ret = execute(v);
-                    vars.remove(0);
-                    vars.remove(0);
-                }
-                temp += c;
+                    if(c == ';'){
+                        Var a = new Var("a");
+                        Var b = new Var("b");
+                        a.set(ret);
+                        b.set(interpret(temp));
+                        Val v = get(op);
+                        vars.add(0, a);
+                        vars.add(0, b);
+                        ret = execute(v);
+                        vars.remove(0);
+                        vars.remove(0);
+                    }
+                    temp += c;
                 break;
                 case 7:
-                if(parenlevel == 0){
-                    ret = interpret(temp);
-                    temp = "";
-                    mode = 3;
-                }
-                temp += c;
+                    if(parenlevel == 0){
+                        ret = interpret(temp);
+                        temp = "";
+                        mode = 3;
+                    }
+                    temp += c;
                 break;
                 case 8:
-                if(c == ';'){
-                    ret = ((Var) ret).get(interpret(temp).toString());
-                }
-                temp += c;
+                    if(c == ';'){
+                        ret = ((Var) ret).get(interpret(temp).toString());
+                    }
+                    temp += c;
                 break;
             }
         }
         return ret;
     }
+    
     static Val get(String name){
         if(contains(name))
             return vars.get(indexOf(name));
         return null;
     } 
+
     static void setadd(Var v){
         if(contains(v.name)) vars.set(indexOf(v.name), v);
         else vars.add(v);
     }
+
     static boolean contains(String v){
         for (Var var : vars) 
             if(var.name.equals(v)) return true;
         return false;
     }
+
     static int indexOf(String v){
         for (int i = 0; i < vars.size(); i++)
             if(vars.get(i).name.equals(v)) return i;
         return -1;
     }
+
 	private static String readFile(String file) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		String line = null;

@@ -12,6 +12,7 @@ class StringTool {
         }
         return false;
     }
+    
     static ArrayList<String> splitList(String s){
         int level = 0;
         ArrayList<String> ret = new ArrayList<>();
@@ -27,6 +28,7 @@ class StringTool {
         ret.add(temp);
         return ret;
     }
+
     static String toString(Val val){
         String ret = "";
         for (int i = 0; i < val.vals.size(); i+=8) {
