@@ -1,13 +1,16 @@
-'` variable
-@  assign
-{} value/set
-;  end
-[] index acess
-~  return
-() group
+'`  variable
+@   assign
+{}  value/array
+,   in betweeen elements of array
+;   end of line
+[]  index acess
+~   return
+()  group
+_   flatten
+.   sub
+abc operation
 
 In future:
-.  sub
 :  this
 
 
@@ -21,13 +24,20 @@ Execute a method:
 'Method`;
 
 MultiLine Method:
-'Method`@{{'Variable`@{Value}},{'Variable2`@{Value2}}};
+'Method`@{
+    {'Variable`@{Value}},
+    {'Variable 2`@{Value 2}}
+};
 
 Array:
 'Variable`@{{Value1},{Value2}};
 
 Element acess:
-'Variable`[0];
+'index 0`@'Variable`[0];
+note: accessing out of bounds elements will always return a false bit
+
+Varibular acess:
+'index 0`@'Variable`[{0}];
 
 Define operator:
 '&`@{
@@ -36,4 +46,18 @@ Define operator:
     {{'res`@{0}}if'not`['b`]},
     {~'res`}
 };
-note: ~/return is used here, it is only used for operations because of technical reasons
+note: ~/return is used here, it can only be used for operations
+note 2: this is the only context local variables exist in as a and b input
+note 3: operations evaluate right to left
+
+Flatten array:
+{{{something}, {something else}}}_ becomes {{something},{something else}}
+note: implementation of this may change
+
+Sub element:
+'a`.{something}@{something else};
+. acts as an operator and the sub value is the interpretation of the right hand side so
+you can do things like 'a`.{5}+{6} to access 'a`.{11}
+sub elements can also be used for aditional local variables
+
+See test.bcrt under src/app for examples

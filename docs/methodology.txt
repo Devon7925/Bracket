@@ -1,0 +1,11 @@
+Loops are achieved through recursion
+
+To achieve sub sub elements you can do ('a`.'b`).'c`
+This is necessary because it evaluates right to left
+
+"local" variables are local within their operation execution so non operation method
+execution does not override them.
+Calling another operation will override them until that operation finishes.
+
+in test.bcrt there are two versions of many functions, an operation version and a non-operation 
+version. This is necessary so that recursion will work but operation versions are prefered
