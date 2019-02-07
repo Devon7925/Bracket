@@ -10,6 +10,10 @@ class Bit extends Val {
         this.b = b;
     }
 
+    Bit(Val v){
+        set(v);
+    }
+
     int toInt(){
         return b?1:0;
     }
@@ -20,14 +24,19 @@ class Bit extends Val {
             return;
         }
         this.b = ((Bit) newval.vals.get(0)).b;
-        this.subelem = new ArrayList<>(newval.subelem);
+        this.subelems = new ArrayList<>(newval.subelems.size());
+        newval.subelems.stream().map(n->n.clone()).forEach(subelems::add);
     }
 
     public String toString(){
-        return (b?"T":"F")+",";
+        return b?"T":"F";
     }
 
     void print(){
-        System.out.print(toString());
+        System.out.print(toString()+",");
+    }
+
+    protected Bit clone(){
+        return new Bit(this);
     }
 }

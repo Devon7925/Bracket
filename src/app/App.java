@@ -13,11 +13,21 @@ public class App {
 		String[] lines = null;
 		try {
 			lines = readFile("src/app/test.bcrt").split(";");
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
         }
         for(String line : lines) execute(line);
         vars.forEach(v -> v.print());
+    }
+    
+    static Val execute(Val v){
+        Val ret = null;
+        if(v.vals.get(0) instanceof Bit) return execute(StringTool.toString(v));
+        else for(Val v1 : v.vals) if(v1.vals.get(0) instanceof Bit) {
+            Val toret = execute(v1);
+            if(toret != null) ret = toret;
+        }
+        return ret;
     }
 
     static Val execute(String s){
@@ -62,23 +72,11 @@ public class App {
                 temp += c;
             break;
             case 2:
-                if(c == ';'){
-                    return new Val(interpret(temp));
-                }
+                if(c == ';') return new Val(interpret(temp));
                 temp += c;
             break;
         }
         return null;
-    }
-    
-    static Val execute(Val v){
-        Val ret = null;
-        if(v.vals.get(0) instanceof Bit) return execute(StringTool.toString(v));
-        else for(Val v1 : v.vals) if(v1.vals.get(0) instanceof Bit) {
-            Val toret = execute(v1);
-            if(toret != null) ret = toret;
-        }
-        return ret;
     }
 
     static Val interpret(String s){
@@ -111,9 +109,7 @@ public class App {
                                 newval.add(interpret(str));
                             ret = new Val();
                             ret.vals = newval;
-                        }else{
-                            ret = new Val(temp);
-                        }
+                        }else ret = new Val(temp);
                         temp = "";
                         mode = 3;
                     }
@@ -195,9 +191,7 @@ public class App {
                     temp += c;
                 break;
                 case 8:
-                    if(c == ';'){
-                        ret = ((Var) ret).get(interpret(temp).toString());
-                    }
+                    if(c == ';') return ((Var) ret).get(interpret(temp).toString());
                     temp += c;
                 break;
             }
@@ -206,26 +200,17 @@ public class App {
     }
     
     static Val get(String name){
-        if(contains(name))
-            return vars.get(indexOf(name));
-        return null;
-    } 
-
-    static void setadd(Var v){
-        if(contains(v.name)) vars.set(indexOf(v.name), v);
-        else vars.add(v);
+        return vars.stream().filter(n -> n.name.equals(name)).findAny().orElse(null);
     }
 
-    static boolean contains(String v){
-        for (Var var : vars) 
-            if(var.name.equals(v)) return true;
-        return false;
+    static void setadd(Var v){
+        int index = indexOf(v.name);
+        if(index == -1) vars.add(v);
+        else vars.set(index, v);
     }
 
     static int indexOf(String v){
-        for (int i = 0; i < vars.size(); i++)
-            if(vars.get(i).name.equals(v)) return i;
-        return -1;
+        return vars.indexOf(get(v));
     }
 
 	private static String readFile(String file) throws IOException {
