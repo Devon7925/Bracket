@@ -16,21 +16,21 @@ public class App {
 		} catch (IOException e) {
 			e.printStackTrace();
         }
-        for(String line : lines) execute(line);
+        for(String line : lines) execute(line, null);
         vars.forEach(v -> v.print());
     }
     
-    static Val execute(Val v){
+    static Val execute(Val v, Val context){
         Val ret = null;
-        if(v.vals.get(0) instanceof Bit) return execute(StringTool.toString(v));
+        if(v.vals.get(0) instanceof Bit) return execute(StringTool.toString(v), context);
         else for(Val v1 : v.vals) if(v1.vals.get(0) instanceof Bit) {
-            Val toret = execute(v1);
+            Val toret = execute(v1, context);
             if(toret != null) ret = toret;
         }
         return ret;
     }
 
-    static Val execute(String s){
+    static Val execute(String s, Val context){
         s = s.trim()+";";
         // System.out.println(s);
         int mode = 0;
@@ -43,17 +43,17 @@ public class App {
                 if(c == '}') vallevel--;
                 if(vallevel == 0) {
                     if(c == '@'){
-                        tempval = interpret(temp);
+                        tempval = interpret(temp, context);
                         temp = "";
                         mode = 1;//set var
                         break;
                     }else if(c == ';'){
-                        tempval = interpret(temp);
+                        tempval = interpret(temp, context);
                         Val ret = null;
                         if(tempval == null);//do nothing
                         else if(tempval.vals == null); //do nothing
                         else if(tempval.vals.size() == 0); //do nothing
-                        else ret = execute(tempval);
+                        else ret = execute(tempval, context);
                         if(ret != null) return ret;
                     }else if(c == '~'){
                         temp = "";
@@ -65,21 +65,21 @@ public class App {
             break;
             case 1://assign to value
                 if(c == ';'){
-                    tempval.set(interpret(temp));
+                    tempval.set(interpret(temp, context));
                     if(tempval instanceof Var && ((Var) tempval).holder == null) setadd((Var) tempval);
                     return null;
                 }
                 temp += c;
             break;
             case 2:
-                if(c == ';') return new Val(interpret(temp));
+                if(c == ';') return new Val(interpret(temp, context));
                 temp += c;
             break;
         }
         return null;
     }
 
-    static Val interpret(String s){
+    static Val interpret(String s, Val context){
         s += ";";
         Val ret = new Val();
         int mode = 0;
@@ -100,13 +100,17 @@ public class App {
                     if(c == '{') mode = 1;
                     else if(c == '\'') mode = 2;
                     else if(c == '(')  mode = 7;
+                    else if(c == ':') {
+                        mode = 3;
+                        ret = context;
+                    }
                 break;
                 case 1://value or array
                     if(vallevel == 0){
                         if(StringTool.isList(temp)){
                             ArrayList<Val> newval = new ArrayList<Val>();
                             for(String str : StringTool.splitList(temp))
-                                newval.add(interpret(str));
+                                newval.add(interpret(str, context));
                             ret = new Val();
                             ret.vals = newval;
                         }else ret = new Val(temp);
@@ -152,7 +156,7 @@ public class App {
                 case 4: //end index acess
                     if(indexlevel == 0){
                         if(temp.matches("\\d+")) ret = ret.get(Integer.parseInt(temp));
-                        else ret = ret.get(interpret(temp).toInt());
+                        else ret = ret.get(interpret(temp, context).toInt());
                         temp = "";
                         mode = 3;
                         break;
@@ -172,26 +176,26 @@ public class App {
                         Var a = new Var("a");
                         Var b = new Var("b");
                         a.set(ret);
-                        b.set(interpret(temp));
+                        b.set(interpret(temp, context));
                         Val v = get(op);
                         vars.add(0, a);
                         vars.add(0, b);
-                        ret = execute(v);
+                        ret = execute(v, v);
                         vars.remove(0);
                         vars.remove(0);
                     }
                     temp += c;
                 break;
-                case 7:
+                case 7://end paren
                     if(parenlevel == 0){
-                        ret = interpret(temp);
+                        ret = interpret(temp, context);
                         temp = "";
                         mode = 3;
                     }
                     temp += c;
                 break;
-                case 8:
-                    if(c == ';') return ((Var) ret).get(interpret(temp).toString());
+                case 8://subelem acess
+                    if(c == ';') return ((Var) ret).get(interpret(temp, context).toString());
                     temp += c;
                 break;
             }

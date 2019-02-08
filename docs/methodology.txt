@@ -7,5 +7,8 @@ This is necessary because it evaluates right to left
 execution does not override them.
 Calling another operation will override them until that operation finishes.
 
+Global variables are often necessary but should be avoided
+one way to do this is to use :/this to create variables specific to a given function
+
 in test.bcrt there are two versions of many functions, an operation version and a non-operation 
 version. This is necessary so that recursion will work but operation versions are prefered
