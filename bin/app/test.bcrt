@@ -1,37 +1,37 @@
-'not`@{{1},{0},{0},{1}};
-'fix`@{{0},{1},{0},{1}};
+'not`@{{1},{0},{0},{1}}; use index access
+'fix`@{{0},{1},{0},{1}}; use index acess... this is for boolean operations
 'if`@{~{{},'a`}['b`]};
 'else`@{{{{},'b`}['not`['a`]]},{~'a`}};
-'#`@{
+'#`@{   use # for methods with only one input
     {'a`},
     {~'b`}
 };
-'&`@{
+'&`@{   boolean and
     {:.{ret}@{1}},
     {{:.{ret}@{0}}if'not`['a`]},
     {{:.{ret}@{0}}if'not`['b`]},
     {~:.{ret}}
 };
-'|`@{
+'|`@{   boolean or
     {:.{ret}@{0}},
     {{:.{ret}@{1}}if'fix`['a`]},
     {{:.{ret}@{1}}if'fix`['b`]},
     {~:.{ret}}
 };
-'^`@{
+'^`@{   boolean xor
     {:.{ret}@{0}},
     {{:.{ret}@'not`[:.{ret}]}if'fix`['a`]},
     {{:.{ret}@'not`[:.{ret}]}if'fix`['b`]},
     {~:.{ret}}
 };
-'app`@{~{'a`, 'b`}_};
+'app`@{~{'a`, 'b`}_};   append two vals 
 'while`@{{'dowhile`}if{}b{}};
 'dowhile`@{
     {'a`},
     {{'dowhile`}if{}b{}}
 };
-'whil`@{{'o`@'b`.{d}},{{'dowhil`}if'a`o'b`}};
-'dowhil`@{
+'whil`@{{'o`@'b`.{d}},{{'dowhil`}if'a`o'b`}};   is NOT an operation
+'dowhil`@{   is NOT an operation
     {'b`.{c}},
     {'o`@'b`.{d}},
     {{'dowhil`}if'a`o'b`}
@@ -43,7 +43,7 @@
     {'b`.{d}@{~'not`[{1}['for`.{b}]]}},
     {'whil`}
 };
-'fo`@{
+'fo`@{   is NOT an operation
     {'b`.{c}@{{'b`.{f}@'dec`#'b`.{f}}, {'b`.{e}}}},
     {'b`.{d}@{~'not`[{1}['b`.{f}]]}},
     {'whil`}
@@ -54,7 +54,7 @@
     {{:.{ret}@{0}}if{1}['a`]^{1}['b`]},
     {~:.{ret}}
 };
-'dec`@{
+'dec`@{   use #
     {'b`.{dec}@{0}},
     {('b`.{dec}).{i}@{0}},
     {'b`.{c}@{{'b`[('b`.{dec}).{i}]@{1}}, {('b`.{dec}).{i}@'inc`#(('b`.{dec}).{i})}}},
@@ -62,7 +62,7 @@
     {'whil`},
     {'b`[('b`.{dec}).{i}]@{0}}
 };
-'inc`@{
+'inc`@{   use #
     {'b`.{i}@{0}},
     {'b`.{c}@{{'b`['b`.{i}]@{0}}, {'b`.{i}@'inc`#('b`.{i})}}},
     {'b`.{d}@{~'b`['b`.{i}]}},

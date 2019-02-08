@@ -39,4 +39,27 @@ class StringTool {
         }
         return ret;
     }
+
+    static String commentFilter(String code){
+        int vallevel = 0,
+            varlevel = 0,
+            indexlevel = 0;
+        String ret = "";
+        boolean commenting = false;
+        for(char c : code.toCharArray()){
+            if(commenting){
+                if(c == '/') commenting = false;
+            }else {
+                if(c == '{')  vallevel++;
+                if(c == '}')  vallevel--;
+                if(c == '\'') varlevel++;
+                if(c == '`')  varlevel--;
+                if(c == '[')  indexlevel++;
+                if(c == ']')  indexlevel--;
+                if(vallevel == 0 && varlevel == 0 && indexlevel == 0 && c == '/') commenting = true;
+                else ret += c;
+            }
+        }
+        return ret;
+    }
 }

@@ -12,7 +12,7 @@ public class App {
     public static void main(String[] args) {
 		String[] lines = null;
 		try {
-			lines = readFile("src/app/test.bcrt").split(";");
+			lines = StringTool.commentFilter(readFile("src/app/test.bcrt")).split(";");
 		} catch (IOException e) {
 			e.printStackTrace();
         }

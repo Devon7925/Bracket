@@ -9,7 +9,8 @@
 _   flatten
 .   sub
 abc operation
-:  this
+:   this
+/   comment
 
 
 Assign a variable to a value:
@@ -63,5 +64,9 @@ This syntax:
 'ex`@{:.{a}@{1234}}
 'ex`;
 'ex`.{a} is now 1234
+
+Commenting:
+When commenting syntax characters (Ex. {,},(,),',`,[,]) use slashes on both sides
+/'this`.{doesn't}@[cause];(errors)/
 
 See test.bcrt under src/app for examples
