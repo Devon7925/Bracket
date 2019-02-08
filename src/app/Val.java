@@ -83,15 +83,20 @@ class Val implements Cloneable{
     }
 
     public String toString(){
-        String ret = "";
-        if(vals != null) for(Val v : vals) ret += v.toString()+",";
-        ret +=",";
-        return ret;
+        String ret = "{";
+        if(vals.size() > 0 && vals.get(0) instanceof Bit){
+            if(vals.size() >= 24 && vals.size()%8 == 0){
+                ret += StringTool.toString(this);
+            }else if(vals.size() > 2){
+                ret += toInt();
+            }
+        }
+        if(ret.length() == 1) for(Val v : vals) ret += v.toString()+",";
+        return ret + "},";
     }
 
     void print(){
-        if(vals != null) for(Val v : vals) v.print();
-        System.out.print(",");
+        System.out.print(toString());
     }
 
     protected Val clone(){
