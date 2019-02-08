@@ -16,9 +16,8 @@ class Var extends Val {
         this.name = v.name;
     }
 
-    void print(){
-        System.out.print('\n'+name+" - ");
-        super.print();
+    public String toString(){
+        return name+" - "+super.toString();
     }
 
     public Var get(String s){

@@ -32,10 +32,6 @@ class Bit extends Val {
         return b?"T":"F";
     }
 
-    void print(){
-        System.out.print(toString()+",");
-    }
-
     protected Bit clone(){
         return new Bit(this);
     }

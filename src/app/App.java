@@ -17,7 +17,7 @@ public class App {
 			e.printStackTrace();
         }
         for(String line : lines) execute(line, null);
-        vars.forEach(v -> v.print());
+        vars.forEach(System.out::println);
     }
     
     static Val execute(Val v, Val context){

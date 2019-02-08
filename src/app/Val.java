@@ -17,10 +17,6 @@ class Val implements Cloneable{
         else set(newval);
     }
 
-    public Val(int newval){
-        set(newval);
-    }
-
     public Val(Val newval){
         set(newval);
     }
@@ -93,10 +89,6 @@ class Val implements Cloneable{
         }
         if(ret.length() == 1) for(Val v : vals) ret += v.toString()+",";
         return ret + "},";
-    }
-
-    void print(){
-        System.out.print(toString());
     }
 
     protected Val clone(){
