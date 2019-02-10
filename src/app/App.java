@@ -17,6 +17,7 @@ public class App {
 			e.printStackTrace();
         }
         vars.add(new Print());
+        vars.add(new Remove());
         for(String line : lines) execute(line, null);
         vars.forEach(System.out::println);
     }
