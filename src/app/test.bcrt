@@ -1,7 +1,10 @@
 'not'@{{1},{0},{0},{1}}; use index access
 'fix'@{{0},{1},{0},{1}}; use index acess... this is for boolean operations
 'if'@{~{{},'a'}['b']};
-'else'@{{{{},'b'}['not'['a']]},{~'a'}};
+'else'@{
+    {{{},'b'}['not'['a']]},
+    {~'a'}
+};
 '#'@{   use # for methods with only one input
     {'a'},
     {~'b'}
@@ -30,7 +33,10 @@
     {'a'},
     {{'dowhile'}if{}b{}}
 };
-'whil'@{{'o'@'b'.{d}},{{'dowhil'}if'a'o'b'}};   is NOT an operation
+'whil'@{   is NOT an operation
+    {'o'@'b'.{d}},
+    {{'dowhil'}if'a'o'b'}
+};
 'dowhil'@{   is NOT an operation
     {'b'.{c}},
     {'o'@'b'.{d}},
@@ -39,12 +45,18 @@
 'for'@{
     {:.{a}@'a'},
     {:.{b}@'b'},
-    {'b'.{c}@{{'for'.{b}@'dec'#'for'.{b}}, {'for'.{a}}}},
+    {'b'.{c}@{
+        {'for'.{b}@'dec'#'for'.{b}},
+        {'for'.{a}}
+    }},
     {'b'.{d}@{~'not'[{1}['for'.{b}]]}},
     {'whil'}
 };
 'fo'@{   is NOT an operation
-    {'b'.{c}@{{'b'.{f}@'dec'#'b'.{f}}, {'b'.{e}}}},
+    {'b'.{c}@{
+        {'b'.{f}@'dec'#'b'.{f}},
+        {'b'.{e}}
+    }},
     {'b'.{d}@{~'not'[{1}['b'.{f}]]}},
     {'whil'}
 };
@@ -81,14 +93,20 @@
 'dec'@{   use #
     {'b'.{dec}@{0}},
     {('b'.{dec}).{i}@{0}},
-    {'b'.{c}@{{'b'[('b'.{dec}).{i}]@{1}}, {('b'.{dec}).{i}@'inc'#(('b'.{dec}).{i})}}},
+    {'b'.{c}@{
+        {'b'[('b'.{dec}).{i}]@{1}},
+        {('b'.{dec}).{i}@'inc'#(('b'.{dec}).{i})}
+    }},
     {'b'.{d}@{~'not'['b'[('b'.{dec}).{i}]]}},
     {'whil'},
     {'b'[('b'.{dec}).{i}]@{0}}
 };
 'inc'@{   use #
     {'b'.{i}@{0}},
-    {'b'.{c}@{{'b'['b'.{i}]@{0}}, {'b'.{i}@'inc'#('b'.{i})}}},
+    {'b'.{c}@{
+        {'b'['b'.{i}]@{0}}, 
+        {'b'.{i}@'inc'#('b'.{i})}
+    }},
     {'b'.{d}@{~'b'['b'.{i}]}},
     {'whil'},
     {'b'['b'.{i}]@{1}}
@@ -114,7 +132,10 @@
 };
 '/'@{
     {:.{ret}@{0}},
-    {'b'.{c}@{{'a'@'a'-'b'},{'/'.{ret}@'inc'#'/'.{ret}}}},
+    {'b'.{c}@{
+        {'a'@'a'-'b'},
+        {'/'.{ret}@'inc'#'/'.{ret}}
+    }},
     {'b'.{d}@{~'a'>='b'}},
     {'whil'},
     {~:.{ret}}
@@ -126,6 +147,7 @@
     {'fo'},
     {~:.{ret}}
 };
+'print'#{hello world};
 '+test'@{101}+{10};
 '-test'@{101}-{10};
 '*test'@{11}*{10};

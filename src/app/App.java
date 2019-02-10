@@ -16,18 +16,9 @@ public class App {
 		} catch (IOException e) {
 			e.printStackTrace();
         }
+        vars.add(new Print());
         for(String line : lines) execute(line, null);
         vars.forEach(System.out::println);
-    }
-    
-    static Val execute(Val v, Val context){
-        Val ret = null;
-        if(v.vals.get(0) instanceof Bit) return execute(StringTool.toString(v), context);
-        else for(Val v1 : v.vals) if(v1.vals.get(0) instanceof Bit) {
-            Val toret = execute(v1, context);
-            if(toret != null) ret = toret;
-        }
-        return ret;
     }
 
     static Val execute(String s, Val context){
@@ -49,12 +40,10 @@ public class App {
                         break;
                     }else if(c == ';'){
                         tempval = interpret(temp, context);
-                        Val ret = null;
-                        if(tempval == null);//do nothing
-                        else if(tempval.vals == null); //do nothing
-                        else if(tempval.vals.size() == 0); //do nothing
-                        else ret = execute(tempval, context);
-                        if(ret != null) return ret;
+                        if(tempval != null){
+                            Val ret = tempval.execute(context);
+                            if(ret != null) return ret;
+                        }
                     }else if(c == '~'){
                         temp = "";
                         mode = 2;
@@ -81,7 +70,7 @@ public class App {
 
     static Val interpret(String s, Val context){
         s += ";";
-        Val ret = new Val();
+        Val ret = null;
         int mode = 0;
         int vallevel = 0,
           indexlevel = 0,
@@ -158,9 +147,8 @@ public class App {
                         if(temp.matches("\\d+")) ret = ret.get(Integer.parseInt(temp));
                         else if(temp.contains(":")){
                             Val newret = new Val();
-                            for (int i = 0; i < ret.vals.size(); i++) {
+                            for (int i = 0; i < ret.vals.size(); i++)
                                 if(interpret(temp, new Val(i)).toInt() == 1) newret.vals.add(ret.vals.get(i).clone());
-                            }
                             ret = newret;
                         }else ret = ret.get(interpret(temp, context).toInt());
                         temp = "";
@@ -179,14 +167,23 @@ public class App {
                 break;
                 case 6://read second input to operation
                     if(c == ';'){
+                        Val tempb = interpret(temp, context);
                         Var a = new Var("a");
                         Var b = new Var("b");
-                        a.set(ret);
-                        b.set(interpret(temp, context));
+                        if(ret instanceof Var){
+                            a = (Var) ret.clone();
+                            a.name = "a";
+                        }else 
+                            a.set(ret);
+                        if(tempb instanceof Var){
+                            b = (Var) tempb.clone();
+                            b.name = "b";
+                        }else 
+                            b.set(tempb);
                         Val v = get(op);
                         vars.add(0, a);
                         vars.add(0, b);
-                        ret = execute(v, v);
+                        ret = v.execute(v);
                         vars.remove(0);
                         vars.remove(0);
                     }

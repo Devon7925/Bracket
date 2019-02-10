@@ -95,6 +95,16 @@ class Val implements Cloneable{
         return ret + "},";
     }
 
+    Val execute(Val context){
+        Val ret = null;
+        if(vals.size() == 0 || vals.get(0) instanceof Bit) return App.execute(StringTool.toString(this), context);
+        else for(Val v1 : vals) if(v1.vals.get(0) instanceof Bit) {
+            Val toret = v1.execute(context);
+            if(toret != null) ret = toret;
+        }
+        return ret;
+    }
+
     protected Val clone(){
         return new Val(this);
     }
