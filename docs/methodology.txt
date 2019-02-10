@@ -1,7 +1,7 @@
 Loops are achieved through recursion
 
-To achieve sub sub elements you can do ('a`.'b`).'c`
-This is necessary because it evaluates right to left
+To achieve sub sub elements you can do ('a'.'b').'c'
+This is necessary because sub element syntax evaluates right to left
 
 "local" variables are local within their operation execution so non operation method
 execution does not override them.

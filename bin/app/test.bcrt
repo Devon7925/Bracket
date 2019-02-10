@@ -1,136 +1,136 @@
-'not`@{{1},{0},{0},{1}}; use index access
-'fix`@{{0},{1},{0},{1}}; use index acess... this is for boolean operations
-'if`@{~{{},'a`}['b`]};
-'else`@{{{{},'b`}['not`['a`]]},{~'a`}};
-'#`@{   use # for methods with only one input
-    {'a`},
-    {~'b`}
+'not'@{{1},{0},{0},{1}}; use index access
+'fix'@{{0},{1},{0},{1}}; use index acess... this is for boolean operations
+'if'@{~{{},'a'}['b']};
+'else'@{{{{},'b'}['not'['a']]},{~'a'}};
+'#'@{   use # for methods with only one input
+    {'a'},
+    {~'b'}
 };
-'&`@{   boolean and
+'&'@{   boolean and
     {:.{ret}@{1}},
-    {{:.{ret}@{0}}if'not`['a`]},
-    {{:.{ret}@{0}}if'not`['b`]},
+    {{:.{ret}@{0}}if'not'['a']},
+    {{:.{ret}@{0}}if'not'['b']},
     {~:.{ret}}
 };
-'|`@{   boolean or
+'|'@{   boolean or
     {:.{ret}@{0}},
-    {{:.{ret}@{1}}if'fix`['a`]},
-    {{:.{ret}@{1}}if'fix`['b`]},
+    {{:.{ret}@{1}}if'fix'['a']},
+    {{:.{ret}@{1}}if'fix'['b']},
     {~:.{ret}}
 };
-'xor`@{   boolean xor
+'xor'@{   boolean xor
     {:.{ret}@{0}},
-    {{:.{ret}@'not`[:.{ret}]}if'fix`['a`]},
-    {{:.{ret}@'not`[:.{ret}]}if'fix`['b`]},
+    {{:.{ret}@'not'[:.{ret}]}if'fix'['a']},
+    {{:.{ret}@'not'[:.{ret}]}if'fix'['b']},
     {~:.{ret}}
 };
-'app`@{~{'a`, 'b`}_};   append two vals 
-'while`@{{'dowhile`}if{}b{}};
-'dowhile`@{
-    {'a`},
-    {{'dowhile`}if{}b{}}
+'app'@{~{'a', 'b'}_};   append two vals 
+'while'@{{'dowhile'}if{}b{}};
+'dowhile'@{
+    {'a'},
+    {{'dowhile'}if{}b{}}
 };
-'whil`@{{'o`@'b`.{d}},{{'dowhil`}if'a`o'b`}};   is NOT an operation
-'dowhil`@{   is NOT an operation
-    {'b`.{c}},
-    {'o`@'b`.{d}},
-    {{'dowhil`}if'a`o'b`}
+'whil'@{{'o'@'b'.{d}},{{'dowhil'}if'a'o'b'}};   is NOT an operation
+'dowhil'@{   is NOT an operation
+    {'b'.{c}},
+    {'o'@'b'.{d}},
+    {{'dowhil'}if'a'o'b'}
 };
-'for`@{
-    {:.{a}@'a`},
-    {:.{b}@'b`},
-    {'b`.{c}@{{'for`.{b}@'dec`#'for`.{b}}, {'for`.{a}}}},
-    {'b`.{d}@{~'not`[{1}['for`.{b}]]}},
-    {'whil`}
+'for'@{
+    {:.{a}@'a'},
+    {:.{b}@'b'},
+    {'b'.{c}@{{'for'.{b}@'dec'#'for'.{b}}, {'for'.{a}}}},
+    {'b'.{d}@{~'not'[{1}['for'.{b}]]}},
+    {'whil'}
 };
-'fo`@{   is NOT an operation
-    {'b`.{c}@{{'b`.{f}@'dec`#'b`.{f}}, {'b`.{e}}}},
-    {'b`.{d}@{~'not`[{1}['b`.{f}]]}},
-    {'whil`}
+'fo'@{   is NOT an operation
+    {'b'.{c}@{{'b'.{f}@'dec'#'b'.{f}}, {'b'.{e}}}},
+    {'b'.{d}@{~'not'[{1}['b'.{f}]]}},
+    {'whil'}
 };
-'=`@{
-    {{:.{ret}@('dec`#'a`)='dec`#'b`}if'not`[{1}['a`]|{1}['b`]]},
-    {{:.{ret}@{1}}if{1}['a`]&{1}['b`]},
-    {{:.{ret}@{0}}if{1}['a`]xor{1}['b`]},
+'='@{
+    {{:.{ret}@('dec'#'a')='dec'#'b'}if'not'[{1}['a']|{1}['b']]},
+    {{:.{ret}@{1}}if{1}['a']&{1}['b']},
+    {{:.{ret}@{0}}if{1}['a']xor{1}['b']},
     {~:.{ret}}
 };
-'<`@{
-    {{:.{ret}@('dec`#'a`)<'dec`#'b`}if'not`[{1}['a`]|{1}['b`]]},
-    {{:.{ret}@{0}}if{1}['a`]|{1}['b`]},
-    {{:.{ret}@{1}}if{1}['a`]&'not`[{1}['b`]]},
+'<'@{
+    {{:.{ret}@('dec'#'a')<'dec'#'b'}if'not'[{1}['a']|{1}['b']]},
+    {{:.{ret}@{0}}if{1}['a']|{1}['b']},
+    {{:.{ret}@{1}}if{1}['a']&'not'[{1}['b']]},
     {~:.{ret}}
 };
-'>`@{
-    {{:.{ret}@('dec`#'a`)>'dec`#'b`}if'not`[{1}['a`]|{1}['b`]]},
-    {{:.{ret}@{0}}if{1}['a`]|{1}['b`]},
-    {{:.{ret}@{1}}if'not`[{1}['a`]]&{1}['b`]},
+'>'@{
+    {{:.{ret}@('dec'#'a')>'dec'#'b'}if'not'[{1}['a']|{1}['b']]},
+    {{:.{ret}@{0}}if{1}['a']|{1}['b']},
+    {{:.{ret}@{1}}if'not'[{1}['a']]&{1}['b']},
     {~:.{ret}}
 };
-'<=`@{
-    {{:.{ret}@('dec`#'a`)<='dec`#'b`}if'not`[{1}['a`]|{1}['b`]]},
-    {{:.{ret}@{0}}if{1}['b`]},
-    {{:.{ret}@{1}}if{1}['a`]},
+'<='@{
+    {{:.{ret}@('dec'#'a')<='dec'#'b'}if'not'[{1}['a']|{1}['b']]},
+    {{:.{ret}@{0}}if{1}['b']},
+    {{:.{ret}@{1}}if{1}['a']},
     {~:.{ret}}
 };
-'>=`@{
-    {{:.{ret}@('dec`#'a`)>='dec`#'b`}if'not`[{1}['a`]|{1}['b`]]},
-    {{:.{ret}@{0}}if{1}['a`]},
-    {{:.{ret}@{1}}if{1}['b`]},
+'>='@{
+    {{:.{ret}@('dec'#'a')>='dec'#'b'}if'not'[{1}['a']|{1}['b']]},
+    {{:.{ret}@{0}}if{1}['a']},
+    {{:.{ret}@{1}}if{1}['b']},
     {~:.{ret}}
 };
-'dec`@{   use #
-    {'b`.{dec}@{0}},
-    {('b`.{dec}).{i}@{0}},
-    {'b`.{c}@{{'b`[('b`.{dec}).{i}]@{1}}, {('b`.{dec}).{i}@'inc`#(('b`.{dec}).{i})}}},
-    {'b`.{d}@{~'not`['b`[('b`.{dec}).{i}]]}},
-    {'whil`},
-    {'b`[('b`.{dec}).{i}]@{0}}
+'dec'@{   use #
+    {'b'.{dec}@{0}},
+    {('b'.{dec}).{i}@{0}},
+    {'b'.{c}@{{'b'[('b'.{dec}).{i}]@{1}}, {('b'.{dec}).{i}@'inc'#(('b'.{dec}).{i})}}},
+    {'b'.{d}@{~'not'['b'[('b'.{dec}).{i}]]}},
+    {'whil'},
+    {'b'[('b'.{dec}).{i}]@{0}}
 };
-'inc`@{   use #
-    {'b`.{i}@{0}},
-    {'b`.{c}@{{'b`['b`.{i}]@{0}}, {'b`.{i}@'inc`#('b`.{i})}}},
-    {'b`.{d}@{~'b`['b`.{i}]}},
-    {'whil`},
-    {'b`['b`.{i}]@{1}}
+'inc'@{   use #
+    {'b'.{i}@{0}},
+    {'b'.{c}@{{'b'['b'.{i}]@{0}}, {'b'.{i}@'inc'#('b'.{i})}}},
+    {'b'.{d}@{~'b'['b'.{i}]}},
+    {'whil'},
+    {'b'['b'.{i}]@{1}}
 };
-'+`@{
-    {'b`.{e}@{'a`@'inc`#'a`}},
-    {'b`.{f}@'b`},
-    {'fo`},
-    {~'a`}
+'+'@{
+    {'b'.{e}@{'a'@'inc'#'a'}},
+    {'b'.{f}@'b'},
+    {'fo'},
+    {~'a'}
 };
-'-`@{
-    {'b`.{e}@{'a`@'dec`#'a`}},
-    {'b`.{f}@'b`},
-    {'fo`},
-    {~'a`}
+'-'@{
+    {'b'.{e}@{'a'@'dec'#'a'}},
+    {'b'.{f}@'b'},
+    {'fo'},
+    {~'a'}
 };
-'*`@{
+'*'@{
     {:.{ret}@{0}},
-    {'b`.{e}@{'*`.{ret}@('*`.{ret})+'a`}},
-    {'b`.{f}@'b`},
-    {'fo`},
+    {'b'.{e}@{'*'.{ret}@('*'.{ret})+'a'}},
+    {'b'.{f}@'b'},
+    {'fo'},
     {~:.{ret}}
 };
-'/`@{
+'/'@{
     {:.{ret}@{0}},
-    {'b`.{c}@{{'a`@'a`-'b`},{'/`.{ret}@'inc`#'/`.{ret}}}},
-    {'b`.{d}@{~'a`>='b`}},
-    {'whil`},
+    {'b'.{c}@{{'a'@'a'-'b'},{'/'.{ret}@'inc'#'/'.{ret}}}},
+    {'b'.{d}@{~'a'>='b'}},
+    {'whil'},
     {~:.{ret}}
 };
-'^`@{
+'^'@{
     {:.{ret}@{1}},
-    {'b`.{e}@{'^`.{ret}@('^`.{ret})*'a`}},
-    {'b`.{f}@'b`},
-    {'fo`},
+    {'b'.{e}@{'^'.{ret}@('^'.{ret})*'a'}},
+    {'b'.{f}@'b'},
+    {'fo'},
     {~:.{ret}}
 };
-'+test`@{101}+{10};
-'-test`@{101}-{10};
-'*test`@{11}*{10};
-'/test`@{34}/{6};
-'^test`@{3}^{3};
-'=test`@{9}>={9};
-': as index test`@'*test`[(:>{1})&:<{4}];
-\``''commenttest]][[@@;;\
+'+test'@{101}+{10};
+'-test'@{101}-{10};
+'*test'@{11}*{10};
+'/test'@{34}/{6};
+'^test'@{3}^{3};
+'=test'@{9}>={9};
+': as index test'@'*test'[(:>{1})&:<{4}];
+\''''commenttest]][[@@;;\

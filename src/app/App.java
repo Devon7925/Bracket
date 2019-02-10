@@ -120,7 +120,7 @@ public class App {
                     temp += c;
                 break;
                 case 2: //Variable
-                    if(c == '`'){
+                    if(c == '\''){
                         ret = get(temp);
                         if(ret == null) ret = new Var(temp);
                         temp = "";
