@@ -17,6 +17,10 @@ class Val implements Cloneable{
         else set(newval);
     }
 
+    public Val(int newval){
+        set(newval);
+    }
+
     public Val(Val newval){
         set(newval);
     }

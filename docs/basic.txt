@@ -65,6 +65,11 @@ This syntax:
 'ex`;
 'ex`.{a} is now 1234
 
+This as index:
+When used in index notation ('val`[index]) : is the index and the thing in [] becomes a pattern
+'something`@{127}[(:>{1})&:<{4}]; bits 2 and 3 of 127
+'something` is now 3
+
 Commenting:
 When commenting syntax characters (Ex. {,},(,),',`,[,]) use slashes on both sides
 \'this`.{doesn't}@[cause];(errors)\

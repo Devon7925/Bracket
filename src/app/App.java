@@ -156,7 +156,13 @@ public class App {
                 case 4: //end index acess
                     if(indexlevel == 0){
                         if(temp.matches("\\d+")) ret = ret.get(Integer.parseInt(temp));
-                        else ret = ret.get(interpret(temp, context).toInt());
+                        else if(temp.contains(":")){
+                            Val newret = new Val();
+                            for (int i = 0; i < ret.vals.size(); i++) {
+                                if(interpret(temp, new Val(i)).toInt() == 1) newret.vals.add(ret.vals.get(i).clone());
+                            }
+                            ret = newret;
+                        }else ret = ret.get(interpret(temp, context).toInt());
                         temp = "";
                         mode = 3;
                         break;
@@ -164,7 +170,7 @@ public class App {
                     temp += c;
                 break;
                 case 5://read operation
-                    if(c == '{' || c == '\'' || c == '('){
+                    if(c == '{' || c == '\'' || c == '(' || c == ':'){
                         mode = 6;
                         op = temp;
                         temp = "";
