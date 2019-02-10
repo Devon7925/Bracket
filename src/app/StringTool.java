@@ -48,7 +48,7 @@ class StringTool {
         boolean commenting = false;
         for(char c : code.toCharArray()){
             if(commenting){
-                if(c == '/') commenting = false;
+                if(c == '\\') commenting = false;
             }else {
                 if(c == '{')  vallevel++;
                 if(c == '}')  vallevel--;
@@ -56,7 +56,7 @@ class StringTool {
                 if(c == '`')  varlevel--;
                 if(c == '[')  indexlevel++;
                 if(c == ']')  indexlevel--;
-                if(vallevel == 0 && varlevel == 0 && indexlevel == 0 && c == '/') commenting = true;
+                if(vallevel == 0 && varlevel == 0 && indexlevel == 0 && c == '\\') commenting = true;
                 else ret += c;
             }
         }
