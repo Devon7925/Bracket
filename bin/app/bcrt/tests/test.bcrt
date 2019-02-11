@@ -2,6 +2,8 @@
     {'a'},
     {~'b'}
 };
+'execute'#{src/app/bcrt/methods/Print.java};
+'execute'#{src/app/bcrt/methods/Remove.java};
 'execute'#{src/app/bcrt/tests/base.bcrt};
 'execute'#{src/app/bcrt/tests/boolean.bcrt};
 'execute'#{src/app/bcrt/tests/loop.bcrt};

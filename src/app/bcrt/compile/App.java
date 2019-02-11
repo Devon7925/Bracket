@@ -1,33 +1,75 @@
 package app.bcrt.compile;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import app.bcrt.methods.*;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
+
+import app.bcrt.methods.Execute;
 
 public class App {
 
     public static final ArrayList<Var> vars = new ArrayList<>();
 
     public static void main(String[] args) {
-        vars.add(new Print());
-        vars.add(new Remove());
         vars.add(new Execute());
         executeFile("src/app/bcrt/tests/test.bcrt");
         vars.forEach(System.out::println);
     }
 
     public static void executeFile(String path){
-		String[] lines = null;
-		try {
-			lines = StringTool.commentFilter(readFile(path)).split(";");
-		} catch (IOException e) {
-			e.printStackTrace();
+        if(path.split("\\.").length>1 && path.split("\\.")[1].equals("bcrt")){
+            String[] lines = null;
+            try {
+                lines = StringTool.commentFilter(readFile(path)).split(";");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            for(String line : lines) execute(line, null);
+        }else{
+            loadMeth(path);
         }
-        for(String line : lines) execute(line, null);
+    }
+
+    public static void loadMeth(String path){
+        File newMeth = new File(path);
+        if (newMeth.getParentFile().exists() || newMeth.getParentFile().mkdirs()) {
+            try {
+                // Compilation Requirements
+                DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+                JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+                StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
+
+                Iterable<? extends JavaFileObject> compilationUnit = fileManager
+                        .getJavaFileObjectsFromFiles(Arrays.asList(newMeth));
+                JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null,
+                        compilationUnit);
+                if (task.call()) {
+                    // Load and execute
+                    URLClassLoader classLoader = new URLClassLoader(new URL[] { new File("./").toURI().toURL() });
+                    Object newmethod = classLoader.loadClass(path.replaceAll("/", ".").replace("src.", "").replace(".java", "")).getConstructors()[0].newInstance();
+
+                    classLoader.close();
+                    if (newmethod instanceof Var) vars.add((Var) newmethod);
+                }
+                fileManager.close();
+            } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException | 
+                    IllegalArgumentException | InvocationTargetException | SecurityException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     static Val execute(String s, Val context){
