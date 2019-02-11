@@ -10,16 +10,21 @@ public class App {
     static ArrayList<Var> vars = new ArrayList<>();
 
     public static void main(String[] args) {
+        vars.add(new Print());
+        vars.add(new Remove());
+        vars.add(new Execute());
+        executeFile("src/app/test.bcrt");
+        vars.forEach(System.out::println);
+    }
+
+    static void executeFile(String path){
 		String[] lines = null;
 		try {
-			lines = StringTool.commentFilter(readFile("src/app/test.bcrt")).split(";");
+			lines = StringTool.commentFilter(readFile(path)).split(";");
 		} catch (IOException e) {
 			e.printStackTrace();
         }
-        vars.add(new Print());
-        vars.add(new Remove());
         for(String line : lines) execute(line, null);
-        vars.forEach(System.out::println);
     }
 
     static Val execute(String s, Val context){

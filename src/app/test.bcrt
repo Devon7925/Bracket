@@ -147,13 +147,4 @@
     {'fo'},
     {~:.{ret}}
 };
-'print'#{hello world};
-'+test'@{101}+{10};
-'-test'@{101}-{10};
-'*test'@{11}*{10};
-'/test'@{34}/{6};
-'^test'@{3}^{3};
-'=test'@{9}>={9};
-': as index test'@'*test'[(:>{1})&:<{4}];
-'remove'#{o}; 
-\''''commenttest]][[@@;;\
+'execute'#{src/app/tests.bcrt};
