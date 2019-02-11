@@ -4,12 +4,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import app.bcrt.methods.*;
 
 public class App {
 
-    public static ArrayList<Var> vars = new ArrayList<>();
+    public static final ArrayList<Var> vars = new ArrayList<>();
 
     public static void main(String[] args) {
         vars.add(new Print());
@@ -36,42 +37,41 @@ public class App {
         String temp = "";
         Val tempval = null;
         int vallevel = 0;
-        for(char c : s.toCharArray()) switch(mode){
-            case 0://check what to do with var
-                if(c == '{') vallevel++;
-                if(c == '}') vallevel--;
-                if(vallevel == 0) {
-                    if(c == '@'){
-                        tempval = interpret(temp, context);
-                        temp = "";
-                        mode = 1;//set var
-                        break;
-                    }else if(c == ';'){
-                        tempval = interpret(temp, context);
-                        if(tempval != null){
-                            Val ret = tempval.execute(context);
-                            if(ret != null) return ret;
+        for(char c : s.toCharArray()) {
+            switch(mode){
+                case 0://check what to do with var
+                    if(c == '{') vallevel++;
+                    if(c == '}') vallevel--;
+                    if(vallevel == 0) {
+                        if(c == '@'){
+                            tempval = interpret(temp, context);
+                            temp = "";
+                            mode = 1;//set var
+                            break;
+                        }else if(c == ';'){
+                            tempval = interpret(temp, context);
+                            if(tempval != null){
+                                Val ret = tempval.execute(context);
+                                if(ret != null) return ret;
+                            }
+                        }else if(c == '~'){
+                            temp = "";
+                            mode = 2;
+                            break;
                         }
-                    }else if(c == '~'){
-                        temp = "";
-                        mode = 2;
-                        break;
                     }
-                }
-                temp += c;
-            break;
-            case 1://assign to value
-                if(c == ';'){
-                    tempval.set(interpret(temp, context));
-                    if(tempval instanceof Var && ((Var) tempval).holder == null) setadd((Var) tempval);
-                    return null;
-                }
-                temp += c;
-            break;
-            case 2:
-                if(c == ';') return new Val(interpret(temp, context));
-                temp += c;
-            break;
+                break;
+                case 1://assign to value
+                    if(c == ';'){
+                        tempval.set(interpret(temp, context));
+                        if(tempval instanceof Var && ((Var) tempval).holder == null) setadd((Var) tempval);
+                        return null;
+                    }
+                break;
+                case 2: if(c == ';') return new Val(interpret(temp, context)); //return value
+                break;
+            }
+            temp += c;
         }
         return null;
     }
@@ -105,11 +105,8 @@ public class App {
                 case 1://value or array
                     if(vallevel == 0){
                         if(StringTool.isList(temp)){
-                            ArrayList<Val> newval = new ArrayList<Val>();
-                            for(String str : StringTool.splitList(temp))
-                                newval.add(interpret(str, context));
                             ret = new Val();
-                            ret.vals = newval;
+                            ret.vals = new ArrayList<>(StringTool.splitList(temp).stream().map(n -> interpret(n, context)).collect(Collectors.toList()));
                         }else ret = new Val(temp);
                         temp = "";
                         mode = 3;
