@@ -1,11 +1,13 @@
-package app;
+package app.bcrt.methods;
 
-class Print extends Var {
+import app.bcrt.compile.*;
+
+public class Print extends Var {
     public Print(){
         super("print");
     }
 
-    Val execute(Val context){
+    public Val execute(Val context){
         System.out.println(new Val(App.interpret("'b'", context)));
         return App.interpret("'b'", context);
     }

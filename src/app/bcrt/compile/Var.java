@@ -1,10 +1,10 @@
-package app;
+package app.bcrt.compile;
 
 import java.util.Optional;
 
-class Var extends Val {
+public class Var extends Val {
 
-    String name;
+    public String name;
     Var holder = null;
 
     public Var(String name){

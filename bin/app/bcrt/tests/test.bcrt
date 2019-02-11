@@ -147,4 +147,4 @@
     {'fo'},
     {~:.{ret}}
 };
-'execute'#{src/app/tests.bcrt};
+'execute'#{src/app/bcrt/tests/tests.bcrt};

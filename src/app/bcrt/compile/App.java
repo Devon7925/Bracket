@@ -1,23 +1,25 @@
-package app;
+package app.bcrt.compile;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import app.bcrt.methods.*;
+
 public class App {
 
-    static ArrayList<Var> vars = new ArrayList<>();
+    public static ArrayList<Var> vars = new ArrayList<>();
 
     public static void main(String[] args) {
         vars.add(new Print());
         vars.add(new Remove());
         vars.add(new Execute());
-        executeFile("src/app/test.bcrt");
+        executeFile("src/app/bcrt/tests/test.bcrt");
         vars.forEach(System.out::println);
     }
 
-    static void executeFile(String path){
+    public static void executeFile(String path){
 		String[] lines = null;
 		try {
 			lines = StringTool.commentFilter(readFile(path)).split(";");
@@ -74,7 +76,7 @@ public class App {
         return null;
     }
 
-    static Val interpret(String s, Val context){
+    public static Val interpret(String s, Val context){
         s += ";";
         Val ret = null;
         int mode = 0;

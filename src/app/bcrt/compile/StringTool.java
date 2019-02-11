@@ -1,8 +1,8 @@
-package app;
+package app.bcrt.compile;
 
 import java.util.ArrayList;
 
-class StringTool {
+public class StringTool {
     static boolean isList(String s){
         int level = 0;
         for(char c : s.toCharArray()){
@@ -29,7 +29,7 @@ class StringTool {
         return ret;
     }
 
-    static String toString(Val val){
+    public static String toString(Val val){
         String ret = "";
         for (int i = 0; i < val.vals.size(); i+=8) {
             int ch = 0;

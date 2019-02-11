@@ -1,8 +1,8 @@
-package app;
+package app.bcrt.compile;
 
 import java.util.ArrayList;
 
-class Val implements Cloneable{
+public class Val implements Cloneable{
     
     ArrayList<Val> vals;
     ArrayList<Var> subelems = new ArrayList<>(0);
@@ -95,7 +95,7 @@ class Val implements Cloneable{
         return ret + "},";
     }
 
-    Val execute(Val context){
+    public Val execute(Val context){
         Val ret = null;
         if(vals.size() == 0 || vals.get(0) instanceof Bit) return App.execute(StringTool.toString(this), context);
         else for(Val v1 : vals) if(v1.vals.get(0) instanceof Bit) {
