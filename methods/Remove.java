@@ -1,4 +1,4 @@
-package app.bcrt.methods;
+package methods;
 
 import app.bcrt.compile.App;
 import app.bcrt.compile.StringTool;
@@ -11,8 +11,8 @@ public class Remove extends Var {
     }
 
     public Val execute(Val context){
-        App.vars.removeIf(n -> n.name.equals(StringTool.toString(App.interpret("'b'", context))));
-        return App.interpret("'b'", context);
+        App.vars.removeIf(n -> n.name.equals(StringTool.toString(App.get("b"))));
+        return App.get("b");
     }
 
     protected Var clone(){

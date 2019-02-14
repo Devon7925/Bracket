@@ -11,8 +11,8 @@ public class Execute extends Var {
     }
 
     public Val execute(Val context){
-        App.executeFile(StringTool.toString(App.interpret("'b'", context)));
-        return App.interpret("'b'", context);
+        App.executeFile(StringTool.toString(App.get("b")));
+        return App.get("b");
     }
 
     protected Var clone(){

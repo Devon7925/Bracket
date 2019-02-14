@@ -1,4 +1,4 @@
-package app.bcrt.methods;
+package methods;
 
 import app.bcrt.compile.*;
 
@@ -8,8 +8,8 @@ public class Print extends Var {
     }
 
     public Val execute(Val context){
-        System.out.println(new Val(App.interpret("'b'", context)));
-        return App.interpret("'b'", context);
+        System.out.println(new Val(App.get("b")));
+        return App.get("b");
     }
 
     protected Var clone(){

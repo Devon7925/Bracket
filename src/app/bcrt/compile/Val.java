@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Val implements Cloneable{
     
-    ArrayList<Val> vals;
+    public ArrayList<Val> vals;
     ArrayList<Var> subelems = new ArrayList<>(0);
 
     public Val(){

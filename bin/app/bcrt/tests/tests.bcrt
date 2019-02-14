@@ -6,5 +6,5 @@
 '^test'@{3}^{3};
 '=test'@{9}>={9};
 ': as index test'@'*test'[(:>{1})&:<{4}];
-'remove'#{o};
+'append test'@{5}app{5};
 \''''commenttest]][[@@;;\

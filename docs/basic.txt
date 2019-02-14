@@ -6,7 +6,6 @@
 []  index acess
 ~   return
 ()  group
-_   flatten
 .   sub
 abc operation
 :   this
@@ -48,10 +47,6 @@ Define operator:
 note: ~/return is used here, it can only be used for operations
 note 2: this is the only context local variables exist in as a and b input
 note 3: operations evaluate right to left
-
-Flatten array:
-{{{something}, {something else}}}_ becomes {{something},{something else}}
-note: implementation of this may change
 
 Sub element:
 'a'.{something}@{something else};

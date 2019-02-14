@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -23,27 +24,44 @@ public class App {
 
     public static final ArrayList<Var> vars = new ArrayList<>();
 
-    public static void main(String[] args) {
+    public static final boolean debuging = false;
+
+    public static void main(String[] args) throws IOException {
         vars.add(new Execute());
-        executeFile("src/app/bcrt/tests/test.bcrt");
+        for(String file : args) executeFile(file);
         vars.forEach(System.out::println);
     }
 
-    public static void executeFile(String path){
-        if(path.split("\\.").length>1 && path.split("\\.")[1].equals("bcrt")){
-            String[] lines = null;
-            try {
-                lines = StringTool.commentFilter(readFile(path)).split(";");
-            } catch (IOException e) {
-                e.printStackTrace();
+    public static void executeFile(String path) {
+        String[] split  = path.split("\\.");
+        if(split.length >= 2){
+            String extension = split[1];
+            switch(extension){
+                case "bcrt": loadBcrtMethod(path);
+                break;
+                case "java": loadJavaMethod(path);
+                break;
+                default:
+                throw new IllegalArgumentException("File type not recognized");
             }
-            for(String line : lines) execute(line, null);
-        }else{
-            loadMeth(path);
+        }else throw new IllegalArgumentException("Input must be path to file");
+    }
+
+    public static String[] getCodeLines(String path){
+        try {
+            return StringTool.commentFilter(fileToString(path)).split(";");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new String[0];
         }
     }
 
-    public static void loadMeth(String path){
+    public static void loadBcrtMethod(String path) {
+        for(String line : getCodeLines(path))
+            execute(line, null);
+    }
+
+    public static void loadJavaMethod(String path) {
         File newMeth = new File(path);
         if (newMeth.getParentFile().exists() || newMeth.getParentFile().mkdirs()) {
             try {
@@ -59,14 +77,22 @@ public class App {
                 if (task.call()) {
                     // Load and execute
                     URLClassLoader classLoader = new URLClassLoader(new URL[] { new File("./").toURI().toURL() });
-                    Object newmethod = classLoader.loadClass(path.replaceAll("/", ".").replace("src.", "").replace(".java", "")).getConstructors()[0].newInstance();
+                    Object newmethod = classLoader.loadClass(
+                        path.replaceAll("/", ".").replace("src.", "").replace(".java", "")
+                    ).getConstructors()[0].newInstance();
 
                     classLoader.close();
-                    if (newmethod instanceof Var) vars.add((Var) newmethod);
+                    if (newmethod instanceof Var) setVar((Var) newmethod);
+                } else {
+                    for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
+                        System.out.format("Error on line %d in %s%n",
+                                diagnostic.getLineNumber(),
+                                diagnostic.getSource().toUri());
+                    }
                 }
                 fileManager.close();
-            } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException | 
-                    IllegalArgumentException | InvocationTargetException | SecurityException e) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | 
+                    IllegalArgumentException | InvocationTargetException | SecurityException | IOException e) {
                 e.printStackTrace();
             }
         }
@@ -74,7 +100,7 @@ public class App {
 
     static Val execute(String s, Val context){
         s = s.trim()+";";
-        // System.out.println(s);
+        if(debuging) System.out.println(s);
         int mode = 0;
         String temp = "";
         Val tempval = null;
@@ -106,7 +132,7 @@ public class App {
                 case 1://assign to value
                     if(c == ';'){
                         tempval.set(interpret(temp, context));
-                        if(tempval instanceof Var && ((Var) tempval).holder == null) setadd((Var) tempval);
+                        if(tempval instanceof Var && ((Var) tempval).holder == null) setVar((Var) tempval);
                         return null;
                     }
                 break;
@@ -136,22 +162,22 @@ public class App {
             else if(c == ')') parenlevel--;
             switch(mode){
                 case 0://start
-                    if(c == '{') mode = 1;
-                    else if(c == '\'') mode = 2;
-                    else if(c == '(')  mode = 7;
+                    if(c == '{') mode = 1;//value
+                    else if(c == '\'') mode = 2;//variable
+                    else if(c == '(')  mode = 7;//group
                     else if(c == ':') {
-                        mode = 3;
                         ret = context;
+                        mode = 3;//read what to do with this
                     }
                 break;
-                case 1://value or array
+                case 1://value
                     if(vallevel == 0){
                         if(StringTool.isList(temp)){
                             ret = new Val();
-                            ret.vals = new ArrayList<>(StringTool.splitList(temp).stream().map(n -> interpret(n, context)).collect(Collectors.toList()));
+                            ret.vals = new ArrayList<>(StringTool.splitList(temp).stream().map(n -> interpret(n, context)).map(Val::new).collect(Collectors.toList()));
                         }else ret = new Val(temp);
                         temp = "";
-                        mode = 3;
+                        mode = 3;//read what to do with this
                     }
                     temp += c;
                 break;
@@ -160,36 +186,24 @@ public class App {
                         ret = get(temp);
                         if(ret == null) ret = new Var(temp);
                         temp = "";
-                        mode = 3;
+                        mode = 3;//read what to do with this
                         break;
                     }
                     temp += c;
                 break;
-                case 3://read what to do with value or Variable
+                case 3://read what to do with ret
                     if(c == '['){
                         temp = "";
-                        mode = 4;
+                        mode = 4; //read index acess
                     }else if(c == '.'){
                         temp = "";
-                        mode = 8;
-                    }else if(c == '_'){
-                        int sum = 0;
-                        for(int i = 0; i < ret.vals.size(); i++){
-                            sum += ret.vals.get(i).vals.size();
-                        }
-                        ArrayList<Val> flatvals = new ArrayList<Val>(sum);
-                        for(int i = 0; i < ret.vals.size(); i++){
-                            for(int j = 0; j < ret.vals.get(i).vals.size(); j++){
-                                flatvals.add(ret.vals.get(i).vals.get(j));
-                            }
-                        }
-                        ret.vals = flatvals;
+                        mode = 8; //subelem access
                     }else{
                         temp = ""+c;
-                        mode = 5;
+                        mode = 5; //read operation
                     }
                 break;
-                case 4: //end index acess
+                case 4: //read index acess
                     if(indexlevel == 0){
                         if(temp.matches("\\d+")) ret = ret.get(Integer.parseInt(temp));
                         else if(temp.contains(":")){
@@ -199,14 +213,14 @@ public class App {
                             ret = newret;
                         }else ret = ret.get(interpret(temp, context).toInt());
                         temp = "";
-                        mode = 3;
+                        mode = 3;//read what to do with ret
                         break;
                     }
                     temp += c;
                 break;
                 case 5://read operation
                     if(c == '{' || c == '\'' || c == '(' || c == ':'){
-                        mode = 6;
+                        mode = 6;//read second input to operation
                         op = temp;
                         temp = "";
                     }
@@ -240,7 +254,7 @@ public class App {
                     if(parenlevel == 0){
                         ret = interpret(temp, context);
                         temp = "";
-                        mode = 3;
+                        mode = 3;//read what to do with ret
                     }
                     temp += c;
                 break;
@@ -253,21 +267,17 @@ public class App {
         return ret;
     }
     
-    static Val get(String name){
+    public static Val get(String name){
         return vars.stream().filter(n -> n.name.equals(name)).findAny().orElse(null);
     }
 
-    static void setadd(Var v){
-        int index = indexOf(v.name);
-        if(index == -1) vars.add(v);
-        else vars.set(index, v);
+    public static void setVar(Var v){
+        int index = vars.indexOf(get(v.name));
+        if(index == -1) vars.add(v); //if it does not already exist, add it
+        else vars.set(index, v); //otherwise set it
     }
 
-    static int indexOf(String v){
-        return vars.indexOf(get(v));
-    }
-
-	private static String readFile(String file) throws IOException {
+	private static String fileToString(String file) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		String line = null;
 		StringBuilder stringBuilder = new StringBuilder();

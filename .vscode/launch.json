@@ -12,25 +12,7 @@
             "console": "internalConsole",
             "stopOnEntry": false,
             "mainClass": "",
-            "args": ""
-        },
-        {
-            "type": "java",
-            "name": "Debug (Launch)-App<Bracket>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopOnEntry": false,
-            "mainClass": "app.App",
-            "args": "",
-            "projectName": "Bracket"
-        },
-        {
-            "type": "java",
-            "name": "Debug (Attach)",
-            "request": "attach",
-            "hostName": "localhost",
-            "port": "<debug port of remote debuggee>"
+            "args": "src/app/bcrt/tests/test.bcrt"
         }
     ]
 }

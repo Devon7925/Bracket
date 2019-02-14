@@ -5,4 +5,4 @@
     {{{},'b'}['not'['a']]},
     {~'a'}
 };
-'app'@{~{'a', 'b'}_};   append two vals  
+'app'@{~'flatten'#{'a', 'b'}};   append two vals  

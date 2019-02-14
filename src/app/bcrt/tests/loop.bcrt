@@ -4,13 +4,15 @@
     {{'dowhile'}if{}b{}}
 };
 'whil'@{   is NOT an operation
-    {'o'@'b'.{d}},
-    {{'dowhil'}if'a'o'b'}
+    {'condition'@'b'.{d}},
+    {{'dowhil'}if'a'condition'b'},
+    {'remove'#{condition}}
 };
 'dowhil'@{   is NOT an operation
     {'b'.{c}},
-    {'o'@'b'.{d}},
-    {{'dowhil'}if'a'o'b'}
+    {'condition'@'b'.{d}},
+    {{'dowhil'}if'a'condition'b'},
+    {'remove'#{condition}}
 };
 'for'@{
     {:.{a}@'a'},
