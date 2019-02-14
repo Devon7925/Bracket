@@ -1,10 +1,10 @@
 'print'#{hello world};
-'+test'@{101}+{10};
-'-test'@{101}-{10};
-'*test'@{11}*{10};
-'/test'@{34}/{6};
-'^test'@{3}^{3};
-'=test'@{9}>={9};
-': as index test'@'*test'[(:>{1})&:<{4}];
-'append test'@{5}app{5};
+'+test'@{sucess}if{111}={101}+{10};
+'-test'@{sucess}if{91}={101}-{10};
+'*test'@{sucess}if{110}={11}*{10};
+'/test'@{sucess}if{5}={34}/{6};
+'^test'@{sucess}if{27}={3}^{3};
+'=test'@{sucess}if{1}={9}>={9};
+': as index test'@{sucess}if{3}={111}[(:>{1})&:<{4}];
+'append test'@{sucess}if{45}={5}app{5};
 \''''commenttest]][[@@;;\

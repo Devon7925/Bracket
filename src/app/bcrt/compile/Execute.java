@@ -1,4 +1,4 @@
-package app.bcrt.methods;
+package app.bcrt.compile;
 
 import app.bcrt.compile.App;
 import app.bcrt.compile.StringTool;

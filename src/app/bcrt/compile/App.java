@@ -18,13 +18,11 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
-import app.bcrt.methods.Execute;
-
 public class App {
 
     public static final ArrayList<Var> vars = new ArrayList<>();
 
-    public static final boolean debuging = false;
+    public static final boolean debugging = false;
 
     public static void main(String[] args) throws IOException {
         vars.add(new Execute());
@@ -49,7 +47,7 @@ public class App {
 
     public static String[] getCodeLines(String path){
         try {
-            return StringTool.commentFilter(fileToString(path)).split(";");
+            return StringTool.removeComments(fileToString(path)).split(";");
         } catch (IOException e) {
             e.printStackTrace();
             return new String[0];
@@ -100,30 +98,30 @@ public class App {
 
     static Val execute(String s, Val context){
         s = s.trim()+";";
-        if(debuging) System.out.println(s);
+        if(debugging) System.out.println(s);
         int mode = 0;
-        String temp = "";
+        String current = "";
         Val tempval = null;
-        int vallevel = 0;
+        int bracketlevel = 0;
         for(char c : s.toCharArray()) {
             switch(mode){
                 case 0://check what to do with var
-                    if(c == '{') vallevel++;
-                    if(c == '}') vallevel--;
-                    if(vallevel == 0) {
+                    if(c == '{') bracketlevel++;
+                    if(c == '}') bracketlevel--;
+                    if(bracketlevel == 0) {
                         if(c == '@'){
-                            tempval = interpret(temp, context);
-                            temp = "";
+                            tempval = interpret(current, context);
+                            current = "";
                             mode = 1;//set var
                             break;
                         }else if(c == ';'){
-                            tempval = interpret(temp, context);
+                            tempval = interpret(current, context);
                             if(tempval != null){
                                 Val ret = tempval.execute(context);
                                 if(ret != null) return ret;
                             }
                         }else if(c == '~'){
-                            temp = "";
+                            current = "";
                             mode = 2;
                             break;
                         }
@@ -131,15 +129,15 @@ public class App {
                 break;
                 case 1://assign to value
                     if(c == ';'){
-                        tempval.set(interpret(temp, context));
+                        tempval.set(interpret(current, context));
                         if(tempval instanceof Var && ((Var) tempval).holder == null) setVar((Var) tempval);
                         return null;
                     }
                 break;
-                case 2: if(c == ';') return new Val(interpret(temp, context)); //return value
+                case 2: if(c == ';') return new Val(interpret(current, context)); //return value
                 break;
             }
-            temp += c;
+            current += c;
         }
         return null;
     }
@@ -148,18 +146,16 @@ public class App {
         s += ";";
         Val ret = null;
         int mode = 0;
-        int vallevel = 0,
-          indexlevel = 0,
-          parenlevel = 0;
-        String temp = "";
-        String op = "";
+        int bracketlevel = 0;
+        String current = "";
+        String operation = "";
         for(char c : s.toCharArray()){
-            if(c == '{') vallevel++;
-            else if(c == '}') vallevel--;
-            else if(c == '[') indexlevel++;
-            else if(c == ']') indexlevel--;
-            else if(c == '(') parenlevel++;
-            else if(c == ')') parenlevel--;
+            switch(c){
+                case '{': case '[': case '(': bracketlevel++;
+                break;
+                case '}': case ']': case ')': bracketlevel--;
+                break;
+            }
             switch(mode){
                 case 0://start
                     if(c == '{') mode = 1;//value
@@ -171,64 +167,64 @@ public class App {
                     }
                 break;
                 case 1://value
-                    if(vallevel == 0){
-                        if(StringTool.isList(temp)){
+                    if(bracketlevel == 0){
+                        if(StringTool.isList(current)){
                             ret = new Val();
-                            ret.vals = new ArrayList<>(StringTool.splitList(temp).stream().map(n -> interpret(n, context)).map(Val::new).collect(Collectors.toList()));
-                        }else ret = new Val(temp);
-                        temp = "";
+                            ret.vals = new ArrayList<>(StringTool.splitList(current).stream().map(n -> interpret(n, context)).map(Val::new).collect(Collectors.toList()));
+                        }else ret = new Val(current);
+                        current = "";
                         mode = 3;//read what to do with this
                     }
-                    temp += c;
+                    current += c;
                 break;
                 case 2: //Variable
                     if(c == '\''){
-                        ret = get(temp);
-                        if(ret == null) ret = new Var(temp);
-                        temp = "";
+                        ret = get(current);
+                        if(ret == null) ret = new Var(current);
+                        current = "";
                         mode = 3;//read what to do with this
                         break;
                     }
-                    temp += c;
+                    current += c;
                 break;
                 case 3://read what to do with ret
                     if(c == '['){
-                        temp = "";
+                        current = "";
                         mode = 4; //read index acess
                     }else if(c == '.'){
-                        temp = "";
+                        current = "";
                         mode = 8; //subelem access
                     }else{
-                        temp = ""+c;
+                        current = ""+c;
                         mode = 5; //read operation
                     }
                 break;
                 case 4: //read index acess
-                    if(indexlevel == 0){
-                        if(temp.matches("\\d+")) ret = ret.get(Integer.parseInt(temp));
-                        else if(temp.contains(":")){
+                    if(bracketlevel == 0){
+                        if(current.matches("\\d+")) ret = ret.get(Integer.parseInt(current));
+                        else if(current.contains(":")){
                             Val newret = new Val();
                             for (int i = 0; i < ret.vals.size(); i++)
-                                if(interpret(temp, new Val(i)).toInt() == 1) newret.vals.add(ret.vals.get(i).clone());
+                                if(interpret(current, new Val(i)).toInt() == 1) newret.vals.add(ret.vals.get(i).clone());
                             ret = newret;
-                        }else ret = ret.get(interpret(temp, context).toInt());
-                        temp = "";
+                        }else ret = ret.get(interpret(current, context).toInt());
+                        current = "";
                         mode = 3;//read what to do with ret
                         break;
                     }
-                    temp += c;
+                    current += c;
                 break;
                 case 5://read operation
                     if(c == '{' || c == '\'' || c == '(' || c == ':'){
                         mode = 6;//read second input to operation
-                        op = temp;
-                        temp = "";
+                        operation = current;
+                        current = "";
                     }
-                    temp += c;
+                    current += c;
                 break;
                 case 6://read second input to operation
                     if(c == ';'){
-                        Val tempb = interpret(temp, context);
+                        Val tempb = interpret(current, context);
                         Var a = new Var("a");
                         Var b = new Var("b");
                         if(ret instanceof Var){
@@ -241,26 +237,26 @@ public class App {
                             b.name = "b";
                         }else 
                             b.set(tempb);
-                        Val v = get(op);
+                        Val v = get(operation);
                         vars.add(0, a);
                         vars.add(0, b);
                         ret = v.execute(v);
                         vars.remove(0);
                         vars.remove(0);
                     }
-                    temp += c;
+                    current += c;
                 break;
                 case 7://end paren
-                    if(parenlevel == 0){
-                        ret = interpret(temp, context);
-                        temp = "";
+                    if(bracketlevel == 0){
+                        ret = interpret(current, context);
+                        current = "";
                         mode = 3;//read what to do with ret
                     }
-                    temp += c;
+                    current += c;
                 break;
                 case 8://subelem acess
-                    if(c == ';') return ((Var) ret).get(interpret(temp, context).toString());
-                    temp += c;
+                    if(c == ';') return ((Var) ret).get(interpret(current, context).toString());
+                    current += c;
                 break;
             }
         }

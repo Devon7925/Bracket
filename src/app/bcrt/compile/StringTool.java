@@ -40,7 +40,7 @@ public class StringTool {
         return ret;
     }
 
-    static String commentFilter(String code){
+    static String removeComments(String code){
         int vallevel = 0,
             indexlevel = 0;
         boolean invar = false;

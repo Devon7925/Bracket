@@ -12,7 +12,7 @@
 };
 'xor'@{   boolean xor
     {:.{ret}@{0}},
-    {{:.{ret}@'not'[:.{ret}]}if'fix'['a']},
-    {{:.{ret}@'not'[:.{ret}]}if'fix'['b']},
+    {{:.{ret}@'not'['xor'.{ret}]}if'fix'['a']},
+    {{:.{ret}@'not'['xor'.{ret}]}if'fix'['b']},
     {~:.{ret}}
 };
