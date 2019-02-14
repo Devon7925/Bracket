@@ -13,7 +13,7 @@ public class StringTool {
         return false;
     }
     
-    static ArrayList<String> splitList(String s){
+    static ArrayList<String> stringToElems(String s){
         int bracketlevel = 0;
         ArrayList<String> ret = new ArrayList<>();
         String temp = "";

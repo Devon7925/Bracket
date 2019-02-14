@@ -12,5 +12,5 @@ one way to do this is to use :/this to create variables specific to a given func
 
 Most comments can just be added but reserved characters do need to use slashes
 
-in test.bcrt there are two versions of many functions, an operation version and a non-operation 
-version. This is necessary so that recursion will work but operation versions are prefered
+in the tests folder there are two versions of many functions, an operation version and a non-operation 
+version. This is necessary so that recursion will work, but operation versions are prefered

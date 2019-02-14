@@ -9,7 +9,7 @@
 .   sub
 abc operation
 :   this
-\   comment
+\\  comment
 
 
 Assign a variable to a value:
@@ -66,7 +66,7 @@ When used in index notation ('val'[index]) : is the index and the thing in [] be
 'something' is now 3
 
 Commenting:
-When commenting syntax characters (Ex. {,},(,),',',[,]) use slashes on both sides
+When commenting syntax characters (Ex. {,},(,),[,],',@) use slashes on both sides
 \'this'.{doesn't}@[cause];(errors)\
 
-See src/app/bcrt/tests for examples
+See tests folder for examples

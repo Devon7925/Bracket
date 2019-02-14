@@ -22,12 +22,12 @@ public class App {
 
     public static final ArrayList<Var> vars = new ArrayList<>();
 
-    public static final boolean debugging = false;
+    public static int debugLevel = 1;
 
     public static void main(String[] args) throws IOException {
         vars.add(new Execute());
         for(String file : args) executeFile(file);
-        vars.forEach(System.out::println);
+        if(debugLevel >= 1) vars.forEach(System.out::println);
     }
 
     public static void executeFile(String path) {
@@ -84,7 +84,7 @@ public class App {
                     else throw new IllegalArgumentException("Improper format");
                 } else {
                     for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                        System.out.format("Error on line %d in %s%n",
+                        System.err.format("Error on line %d in %s%n",
                                 diagnostic.getLineNumber(),
                                 diagnostic.getSource().toUri());
                     }
@@ -99,7 +99,7 @@ public class App {
 
     static Val execute(String s, Val context){
         s = s.trim()+";";
-        if(debugging) System.out.println(s);
+        if(debugLevel >= 2) System.out.println(s);
         int mode = 0;
         String current = "";
         Val tempval = null;
@@ -171,7 +171,7 @@ public class App {
                     if(bracketlevel == 0){
                         if(StringTool.isList(current)){
                             ret = new Val();
-                            ret.vals = new ArrayList<>(StringTool.splitList(current).stream().map(n -> interpret(n, context)).map(Val::new).collect(Collectors.toList()));
+                            ret.vals = new ArrayList<>(StringTool.stringToElems(current).stream().map(n -> interpret(n, context)).map(Val::new).collect(Collectors.toList()));
                         }else ret = new Val(current);
                         current = "";
                         mode = 3;//read what to do with this
