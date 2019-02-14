@@ -192,9 +192,6 @@ public class App {
                     if(c == '['){
                         current = "";
                         mode = 4; //read index acess
-                    }else if(c == '.'){
-                        current = "";
-                        mode = 8; //subelem access
                     }else{
                         current = ""+c;
                         mode = 5; //read operation
@@ -223,25 +220,29 @@ public class App {
                     }
                     current += c;
                 break;
-                case 6://read second input to operation
+                case 6://read second input and execute operation
                     if(c == ';'){
                         Val tempb = interpret(current, context);
-                        Var a = new Var("a");
-                        Var b = new Var("b");
-                        if(ret instanceof Var){
-                            a = (Var) ret.clone();
-                            a.name = "a";
-                        }else a.set(ret);
-                        if(tempb instanceof Var){
-                            b = (Var) tempb.clone();
-                            b.name = "b";
-                        }else b.set(tempb);
-                        Val v = get(operation);
-                        vars.add(0, a);
-                        vars.add(0, b);
-                        ret = v.execute(v);
-                        vars.remove(0);
-                        vars.remove(0);
+                        if(operation.equals(".")){
+                            ret = ((Var) ret).get(tempb.toString());
+                        }else{
+                            Var a = new Var("a");
+                            Var b = new Var("b");
+                            if(ret instanceof Var){
+                                a = (Var) ret.clone();
+                                a.name = "a";
+                            }else a.set(ret);
+                            if(tempb instanceof Var){
+                                b = (Var) tempb.clone();
+                                b.name = "b";
+                            }else b.set(tempb);
+                            Val v = get(operation);
+                            vars.add(0, a);
+                            vars.add(0, b);
+                            ret = v.execute(v);
+                            vars.remove(0);
+                            vars.remove(0);
+                        }
                     }
                     current += c;
                 break;
@@ -251,10 +252,6 @@ public class App {
                         current = "";
                         mode = 3;//read what to do with ret
                     }
-                    current += c;
-                break;
-                case 8://subelem acess
-                    if(c == ';') return ((Var) ret).get(interpret(current, context).toString());
                     current += c;
                 break;
             }
