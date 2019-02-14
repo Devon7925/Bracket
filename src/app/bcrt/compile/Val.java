@@ -76,9 +76,20 @@ public class Val implements Cloneable{
         }
     };
 
-    int toInt(){
+    int interpretInt(){
         int ret = 0;
-        for (int i = 0; i < vals.size(); i++) ret += vals.get(i).toInt() << i;
+        for (int i = 0; i < vals.size(); i++) ret += vals.get(i).interpretInt() << i;
+        return ret;
+    }
+
+    public String interpretString(){
+        String ret = "";
+        for (int i = 0; i < vals.size(); i+=8) {
+            int ch = 0;
+            for(int j = 0; j < 8; j++)
+                ch += vals.get(i+j).interpretInt() << j;
+            ret += (char) ch;
+        }
         return ret;
     }
 
@@ -86,9 +97,9 @@ public class Val implements Cloneable{
         String ret = "{";
         if(vals.size() > 0 && vals.get(0) instanceof Bit){
             if(vals.size() >= 24 && vals.size()%8 == 0){
-                ret += StringTool.toString(this);
+                ret += interpretString();
             }else if(vals.size() > 2){
-                ret += toInt();
+                ret += interpretInt();
             }
         }
         if(ret.length() == 1) for(Val v : vals) ret += v.toString()+",";
@@ -97,7 +108,7 @@ public class Val implements Cloneable{
 
     public Val execute(Val context){
         Val ret = null;
-        if(vals.size() == 0 || vals.get(0) instanceof Bit) return App.execute(StringTool.toString(this), context);
+        if(vals.size() == 0 || vals.get(0) instanceof Bit) return App.execute(interpretString(), context);
         else for(Val v1 : vals) if(v1.vals.get(0) instanceof Bit) {
             Val toret = v1.execute(context);
             if(toret != null) ret = toret;

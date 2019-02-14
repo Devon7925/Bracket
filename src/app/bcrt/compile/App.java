@@ -81,6 +81,7 @@ public class App {
 
                     classLoader.close();
                     if (newmethod instanceof Var) setVar((Var) newmethod);
+                    else throw new IllegalArgumentException("Improper format");
                 } else {
                     for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
                         System.out.format("Error on line %d in %s%n",
@@ -205,9 +206,9 @@ public class App {
                         else if(current.contains(":")){
                             Val newret = new Val();
                             for (int i = 0; i < ret.vals.size(); i++)
-                                if(interpret(current, new Val(i)).toInt() == 1) newret.vals.add(ret.vals.get(i).clone());
+                                if(interpret(current, new Val(i)).interpretInt() == 1) newret.vals.add(ret.vals.get(i).clone());
                             ret = newret;
-                        }else ret = ret.get(interpret(current, context).toInt());
+                        }else ret = ret.get(interpret(current, context).interpretInt());
                         current = "";
                         mode = 3;//read what to do with ret
                         break;
@@ -230,13 +231,11 @@ public class App {
                         if(ret instanceof Var){
                             a = (Var) ret.clone();
                             a.name = "a";
-                        }else 
-                            a.set(ret);
+                        }else a.set(ret);
                         if(tempb instanceof Var){
                             b = (Var) tempb.clone();
                             b.name = "b";
-                        }else 
-                            b.set(tempb);
+                        }else b.set(tempb);
                         Val v = get(operation);
                         vars.add(0, a);
                         vars.add(0, b);

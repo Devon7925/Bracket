@@ -14,7 +14,7 @@ class Bit extends Val {
         set(v);
     }
 
-    int toInt(){
+    int interpretInt(){
         return b?1:0;
     }
 

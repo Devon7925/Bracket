@@ -11,7 +11,7 @@ public class Remove extends Var {
     }
 
     public Val execute(Val context){
-        App.vars.removeIf(n -> n.name.equals(StringTool.toString(App.get("b"))));
+        App.vars.removeIf(n -> n.name.equals(App.get("b").interpretString()));
         return App.get("b");
     }
 
