@@ -69,4 +69,4 @@ Commenting:
 When commenting syntax characters (Ex. {,},(,),',',[,]) use slashes on both sides
 \'this'.{doesn't}@[cause];(errors)\
 
-See test.bcrt under src/app for examples
+See src/app/bcrt/tests for examples
