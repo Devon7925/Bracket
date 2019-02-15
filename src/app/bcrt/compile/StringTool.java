@@ -1,5 +1,8 @@
 package app.bcrt.compile;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class StringTool {
@@ -46,5 +49,31 @@ public class StringTool {
             }
         }
         return ret;
+    }
+
+	static String fileToString(String file) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		String line = null;
+		StringBuilder stringBuilder = new StringBuilder();
+		String ls = System.getProperty("line.separator");
+		try {
+			while((line = reader.readLine()) != null) {
+				stringBuilder.append(line);
+				stringBuilder.append(ls);
+			}
+			stringBuilder.delete(stringBuilder.lastIndexOf(ls), stringBuilder.length());
+			return stringBuilder.toString();
+		} finally {
+			reader.close();
+		}
+	}
+
+    static String[] getCodeLines(String path){
+        try {
+            return StringTool.removeComments(fileToString(path)).split(";");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new String[0];
+        }
     }
 }

@@ -23,7 +23,7 @@ class Bit extends Val {
             b = ((Bit) newval).b;
             return;
         }
-        this.b = ((Bit) newval.vals.get(0)).b;
+        this.b = ((Bit) newval.value.get(0)).b;
         this.subelems = new ArrayList<>(newval.subelems.size());
         newval.subelems.stream().map(n->n.clone()).forEach(subelems::add);
     }

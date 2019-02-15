@@ -1,8 +1,6 @@
 package app.bcrt.compile;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -45,17 +43,8 @@ public class App {
         }else throw new IllegalArgumentException("Input must be path to file");
     }
 
-    public static String[] getCodeLines(String path){
-        try {
-            return StringTool.removeComments(fileToString(path)).split(";");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new String[0];
-        }
-    }
-
     public static void loadBcrtMethod(String path) {
-        for(String line : getCodeLines(path))
+        for(String line : StringTool.getCodeLines(path))
             execute(line, null);
     }
 
@@ -171,7 +160,7 @@ public class App {
                     if(bracketlevel == 0){
                         if(StringTool.isList(current)){
                             ret = new Val();
-                            ret.vals = new ArrayList<>(StringTool.stringToElems(current).stream().map(n -> interpret(n, context)).map(Val::new).collect(Collectors.toList()));
+                            ret.value = new ArrayList<>(StringTool.stringToElems(current).stream().map(n -> interpret(n, context)).map(Val::new).collect(Collectors.toList()));
                         }else ret = new Val(current);
                         current = "";
                         mode = 3;//read what to do with this
@@ -201,10 +190,10 @@ public class App {
                     if(bracketlevel == 0){
                         if(current.matches("\\d+")) ret = ret.get(Integer.parseInt(current));
                         else if(current.contains(":")){
-                            Val newret = new Val();
-                            for (int i = 0; i < ret.vals.size(); i++)
-                                if(interpret(current, new Val(i)).interpretInt() == 1) newret.vals.add(ret.vals.get(i).clone());
-                            ret = newret;
+                            Val filteredval = new Val();
+                            for (int i = 0; i < ret.value.size(); i++)
+                                if(interpret(current, new Val(i)).interpretInt() == 1) filteredval.value.add(ret.value.get(i).clone());
+                            ret = filteredval;
                         }else ret = ret.get(interpret(current, context).interpretInt());
                         current = "";
                         mode = 3;//read what to do with ret
@@ -268,21 +257,4 @@ public class App {
         if(index == -1) vars.add(v); //if it does not already exist, add it
         else vars.set(index, v); //otherwise set it
     }
-
-	private static String fileToString(String file) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		String line = null;
-		StringBuilder stringBuilder = new StringBuilder();
-		String ls = System.getProperty("line.separator");
-		try {
-			while((line = reader.readLine()) != null) {
-				stringBuilder.append(line);
-				stringBuilder.append(ls);
-			}
-			stringBuilder.delete(stringBuilder.lastIndexOf(ls), stringBuilder.length());
-			return stringBuilder.toString();
-		} finally {
-			reader.close();
-		}
-	}
 }

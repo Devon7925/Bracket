@@ -11,17 +11,17 @@ public class Flatten extends Var {
 
     public Val execute(Val context){
         Val ret = App.get("b");
-        int numvals = 0;
-        for(int i = 0; i < ret.vals.size(); i++){
-            numvals += ret.vals.get(i).vals.size();
+        int numvalue = 0;
+        for(int i = 0; i < ret.value.size(); i++){
+            numvalue += ret.value.get(i).value.size();
         }
-        ArrayList<Val> flatvals = new ArrayList<Val>(numvals);
-        for(int i = 0; i < ret.vals.size(); i++){
-            for(int j = 0; j < ret.vals.get(i).vals.size(); j++){
-                flatvals.add(ret.vals.get(i).vals.get(j));
+        ArrayList<Val> flatvalue = new ArrayList<Val>(numvalue);
+        for(int i = 0; i < ret.value.size(); i++){
+            for(int j = 0; j < ret.value.get(i).value.size(); j++){
+                flatvalue.add(ret.value.get(i).value.get(j));
             }
         }
-        ret.vals = flatvals;
+        ret.value = flatvalue;
         return ret;
     }
 
