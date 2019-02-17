@@ -12,5 +12,5 @@
 {{Expodential},{27}}check{3}^{3};
 {{Inequality},{1}}check{9}>={9};
 {{index filter test},{3}}check{111}[(:>{1})&:<{4}];
-'input'#{Age?};
+'print'#'input'#{Age?};
 \''''commenttest]][[}}{{))((@@;;\
