@@ -20,7 +20,7 @@ public class App {
 
     public static final ArrayList<Var> vars = new ArrayList<>();
 
-    public static int debugLevel = 1;
+    public static int debugLevel = 0;
 
     public static void main(String[] args) throws IOException {
         vars.add(new Execute());

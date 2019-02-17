@@ -5,6 +5,7 @@
 'execute'#{methods/Flatten.java};
 'execute'#{methods/Print.java};
 'execute'#{methods/Remove.java};
+'execute'#{methods/Input.java};
 'execute'#{tests/base.bcrt};
 'execute'#{tests/boolean.bcrt};
 'execute'#{tests/loop.bcrt};

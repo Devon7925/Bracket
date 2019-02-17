@@ -2,18 +2,20 @@ package methods;
 
 import app.bcrt.compile.*;
 
-public class Print extends Var {
-    public Print(){
-        super("print");
+public class Input extends Var {
+    public Input(){
+        super("input");
     }
 
     public Val execute(Val context){
         System.out.println(new Val(App.get("b")));
-        App.setVar(new Var("b"));
+        Var b = new Var("b");
+        b.set(";");//TODO
+        App.setVar(b);
         return App.get("b");
     }
 
     protected Var clone(){
-        return new Print();
+        return new Input();
     }
 }
