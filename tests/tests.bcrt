@@ -10,7 +10,9 @@
 {{Division},{5}}check{34}/{6};
 {{Modulo},{4}}check{34}%{6};
 {{Expodential},{27}}check{3}^{3};
-{{Inequality},{1}}check{9}>={9};
+{{Inequality},{1}}check{9}>={9}`    `;
 {{index filter test},{3}}check{111}[(:>{1})&:<{4}];
+{{bit shift L},{28}}check'<<'#{14};
+{{bit shift R},{7}}check'>>'#{14};
 'print'#'input'#{Age?};
 \''''commenttest]][[}}{{))((@@;;\
