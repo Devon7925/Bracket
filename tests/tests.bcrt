@@ -4,15 +4,11 @@
     {:.{ret}@'a'[0]app{ - }app:.{ret}},
     {'print'#:.{ret}}
 };
-{{Addition},{111}}check{101}+{10};
-{{Subtraction},{91}}check{101}-{10};
-{{Multiplication},{110}}check{11}*{10};
-{{Division},{5}}check{34}/{6};
-{{Modulo},{4}}check{34}%{6};
-{{Expodential},{27}}check{3}^{3};
-{{Inequality},{1}}check{9}>={9}`    `;
-{{index filter test},{3}}check{111}[(:>{1})&:<{4}];
-{{bit shift L},{28}}check'<<'#{14};
-{{bit shift R},{7}}check'>>'#{14};
-'print'#'input'#{Age?};
-\''''commenttest]][[}}{{))((@@;;\
+{{Addition         },{111}}check{101}+{10};
+{{Subtraction      },{91} }check{101}-{10};
+{{Multiplication   },{110}}check{11}*{10};
+{{Division         },{5}  }check{34}/{6};
+{{Modulo           },{4}  }check{34}%{6};
+{{Expodential      },{27} }check{3}^{3};
+{{bit shift L      },{56} }check{14}<<{2};
+{{bit shift R      },{3}  }check{14}>>{2};

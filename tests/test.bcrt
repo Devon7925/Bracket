@@ -13,3 +13,4 @@
 'execute'#{tests/bit.bcrt};
 'execute'#{tests/operations.bcrt};
 'execute'#{tests/tests.bcrt};
+\ 'execute'#{tests/auxtests.bcrt}; \
