@@ -89,20 +89,20 @@ public class App {
     static Val execute(String s, Val context){
         s = s.trim()+";";
         if(debugLevel >= 2) System.out.println(s);
-        int mode = 0;
+        Mode mode = Mode.START;
         String current = "";
         Val tempval = null;
         int bracketlevel = 0;
         for(char c : s.toCharArray()) {
             switch(mode){
-                case 0://check what to do with var
+                case START:
                     if(c == '{') bracketlevel++;
                     if(c == '}') bracketlevel--;
                     if(bracketlevel == 0) {
                         if(c == '@'){
                             tempval = interpret(current, context);
                             current = "";
-                            mode = 1;//set var
+                            mode = Mode.ASSIGN;
                             break;
                         }else if(c == ';'){
                             tempval = interpret(current, context);
@@ -112,20 +112,22 @@ public class App {
                             }
                         }else if(c == '~'){
                             current = "";
-                            mode = 2;
+                            mode = Mode.RETURN;
                             break;
                         }
                     }
                 break;
-                case 1://assign to value
+                case ASSIGN:
                     if(c == ';'){
                         tempval.set(interpret(current, context));
                         if(tempval instanceof Var && ((Var) tempval).holder == null) setVar((Var) tempval);
                         return null;
                     }
                 break;
-                case 2: if(c == ';') return new Val(interpret(current, context)); //return value
+                case RETURN: 
+                    if(c == ';') return new Val(interpret(current, context));
                 break;
+                default: System.err.println("Something very wrong happened");
             }
             current += c;
         }
@@ -135,7 +137,7 @@ public class App {
     public static Val interpret(String s, Val context){
         s += ";";
         Val ret = null;
-        int mode = 0;
+        Mode mode = Mode.START;
         int bracketlevel = 0;
         String current = "";
         String operation = "";
@@ -147,46 +149,46 @@ public class App {
                 break;
             }
             switch(mode){
-                case 0://start
-                    if(c == '{') mode = 1;//value
-                    else if(c == '\'') mode = 2;//variable
-                    else if(c == '(')  mode = 7;//group
+                case START:
+                    if(c == '{') mode = Mode.VALUE;
+                    else if(c == '\'') mode = Mode.VARIABLE;
+                    else if(c == '(')  mode = Mode.PARENTHESIS;
                     else if(c == ':') {
                         ret = context;
-                        mode = 3;//read what to do with this
+                        mode = Mode.MODIFIER;
                     }
                 break;
-                case 1://value
+                case VALUE:
                     if(bracketlevel == 0){
                         if(StringTool.isList(current)){
                             ret = new Val();
                             ret.value = new ArrayList<>(StringTool.stringToElems(current).stream().map(n -> interpret(n, context)).map(Val::new).collect(Collectors.toList()));
                         }else ret = new Val(current);
                         current = "";
-                        mode = 3;//read what to do with this
+                        mode = Mode.MODIFIER;
                     }
                     current += c;
                 break;
-                case 2: //Variable
+                case VARIABLE:
                     if(c == '\''){
                         ret = get(current);
                         if(ret == null) ret = new Var(current);
                         current = "";
-                        mode = 3;//read what to do with this
+                        mode = Mode.MODIFIER;
                         break;
                     }
                     current += c;
                 break;
-                case 3://read what to do with ret
+                case MODIFIER://read what to do with ret
                     if(c == '['){
                         current = "";
-                        mode = 4; //read index acess
+                        mode = Mode.INDEX;
                     }else{
                         current = ""+c;
-                        mode = 5; //read operation
+                        mode = Mode.OPERATION;
                     }
                 break;
-                case 4: //read index acess
+                case INDEX: //read index acess
                     if(bracketlevel == 0){
                         if(current.matches("\\d+")) ret = ret.get(Integer.parseInt(current));
                         else if(current.contains(":")){
@@ -196,20 +198,20 @@ public class App {
                             ret = filteredval;
                         }else ret = ret.get(interpret(current, context).interpretInt());
                         current = "";
-                        mode = 3;//read what to do with ret
+                        mode = Mode.MODIFIER;
                         break;
                     }
                     current += c;
                 break;
-                case 5://read operation
+                case OPERATION://read operation
                     if(c == '{' || c == '\'' || c == '(' || c == ':'){
-                        mode = 6;//read second input to operation
+                        mode = Mode.INPUT2;
                         operation = current;
                         current = "";
                     }
                     current += c;
                 break;
-                case 6://read second input and execute operation
+                case INPUT2://read second input and execute operation
                     if(c == ';'){
                         Val tempb = interpret(current, context);
                         if(operation.equals(".")){
@@ -235,14 +237,15 @@ public class App {
                     }
                     current += c;
                 break;
-                case 7://end paren
+                case PARENTHESIS://end paren
                     if(bracketlevel == 0){
                         ret = interpret(current, context);
                         current = "";
-                        mode = 3;//read what to do with ret
+                        mode = Mode.MODIFIER;
                     }
                     current += c;
                 break;
+                default: System.err.println("Something very wrong happened");
             }
         }
         return ret;
