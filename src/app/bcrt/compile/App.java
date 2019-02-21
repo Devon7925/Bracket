@@ -107,7 +107,7 @@ public class App {
                         }else if(c == ';'){
                             tempval = interpret(current, context);
                             if(tempval != null){
-                                Val ret = tempval.execute(context);
+                                Val ret = tempval.execute(tempval instanceof Var?tempval:context);
                                 if(ret != null) return ret;
                             }
                         }else if(c == '~'){
@@ -162,7 +162,9 @@ public class App {
                     if(bracketlevel == 0){
                         if(StringTool.isList(current)){
                             ret = new Val();
-                            ret.value = new ArrayList<>(StringTool.stringToElems(current).stream().map(n -> interpret(n, context)).map(Val::new).collect(Collectors.toList()));
+                            ret.value = new ArrayList<>(
+                                StringTool.stringToElems(current).stream().map(n -> interpret(n, context)).map(Val::new).collect(Collectors.toList())
+                            );
                         }else ret = new Val(current);
                         current = "";
                         mode = Mode.MODIFIER;
