@@ -43,7 +43,7 @@ public class App {
     public static void executeFile(String path) {
         String[] split  = path.split("\\.");
         if(split.length >= 2){
-            String extension = split[1];
+            String extension = split[split.length-1];
             switch(extension){
                 case "bcrt": loadBcrtMethod(path);
                 break;
@@ -75,9 +75,10 @@ public class App {
                         compilationUnit);
                 if (task.call()) {
                     // Load and execute
-                    URLClassLoader classLoader = new URLClassLoader(new URL[] { new File("./").toURI().toURL() });
+                    URLClassLoader classLoader = new URLClassLoader(new URL[] { newMeth.getParentFile().toURI().toURL() });
+                    String[] splitpath = path.replaceAll("/", ".").split("\\.");
                     Object newmethod = classLoader.loadClass(
-                        path.replaceAll("/", ".").replace("src.", "").replace(".java", "")
+                        splitpath[splitpath.length-2]
                     ).getConstructors()[0].newInstance();
 
                     classLoader.close();

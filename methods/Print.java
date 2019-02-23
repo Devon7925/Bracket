@@ -1,5 +1,3 @@
-package methods;
-
 import app.bcrt.compile.*;
 
 public class Print extends Var {

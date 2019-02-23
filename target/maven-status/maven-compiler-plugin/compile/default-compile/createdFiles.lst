@@ -1,0 +1,8 @@
+app\bcrt\compile\Bit.class
+app\bcrt\compile\Execute.class
+app\bcrt\compile\Mode.class
+app\bcrt\compile\StringTool.class
+app\bcrt\compile\App.class
+app\bcrt\compile\Val.class
+app\bcrt\compile\App$1.class
+app\bcrt\compile\Var.class

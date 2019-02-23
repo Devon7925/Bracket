@@ -1,5 +1,3 @@
-package methods;
-
 import app.bcrt.compile.App;
 import app.bcrt.compile.StringTool;
 import app.bcrt.compile.Val;
