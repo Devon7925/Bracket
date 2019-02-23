@@ -12,7 +12,7 @@
             "console": "internalConsole",
             "stopOnEntry": false,
             "mainClass": "",
-            "args": "tests/test.bcrt"
+            "args": "-d 0 tests/test.bcrt"
         }
     ]
 }

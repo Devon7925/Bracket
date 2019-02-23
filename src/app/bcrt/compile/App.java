@@ -24,8 +24,20 @@ public class App {
 
     public static void main(String[] args) throws IOException {
         vars.add(new Execute());
-        for(String file : args) executeFile(file);
+        interpretArgs(args);
+        for(String file : args[args.length-1].split(",")) executeFile(file);
         if(debugLevel >= 1) vars.forEach(System.out::println);
+    }
+
+    public static void interpretArgs(String[] args){
+        for (int i = 0; i < args.length-1; i++) {
+            if(args[i].equals("-d")){
+                String debug = args[++i];
+                if(debug.matches("\\d+")){
+                    debugLevel = Integer.parseInt(debug);
+                }else throw new IllegalArgumentException("Debug level must be integer");
+            }
+        }
     }
 
     public static void executeFile(String path) {
