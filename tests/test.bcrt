@@ -2,15 +2,16 @@
     {'a'},
     {~'b'}
 };
-'execute'#{methods/Flatten.java};
-'execute'#{methods/Print.java};
-'execute'#{methods/Remove.java};
-'execute'#{methods/Input.java};
-'execute'#{tests/base.bcrt};
-'execute'#{tests/boolean.bcrt};
-'execute'#{tests/loop.bcrt};
-'execute'#{tests/inequalities.bcrt};
-'execute'#{tests/bit.bcrt};
-'execute'#{tests/operations.bcrt};
-'execute'#{tests/tests.bcrt};
+'execute'#{C:/Users/Public/eclipse-workspace/Bracket/methods/Flatten.java};
+'execute'#{C:/Users/Public/eclipse-workspace/Bracket/tests/base.bcrt};
+'path'@{C:/Users/Public/eclipse-workspace/Bracket/}; global path necessary for cmd execution
+'execute'#'path'app{methods/Print.java};
+'execute'#'path'app{methods/Remove.java};
+'execute'#'path'app{methods/Input.java};
+'execute'#'path'app{tests/boolean.bcrt};
+'execute'#'path'app{tests/loop.bcrt};
+'execute'#'path'app{tests/inequalities.bcrt};
+'execute'#'path'app{tests/bit.bcrt};
+'execute'#'path'app{tests/operations.bcrt};
+'execute'#'path'app{tests/tests.bcrt};
 \ 'execute'#{tests/auxtests.bcrt}; \
