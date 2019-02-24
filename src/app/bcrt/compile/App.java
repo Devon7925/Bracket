@@ -76,10 +76,8 @@ public class App {
                 if (task.call()) {
                     // Load and execute
                     URLClassLoader classLoader = new URLClassLoader(new URL[] { newMeth.getParentFile().toURI().toURL() });
-                    String[] splitpath = path.replaceAll("/", ".").split("\\.");
-                    Object newmethod = classLoader.loadClass(
-                        splitpath[splitpath.length-2]
-                    ).getConstructors()[0].newInstance();
+                    String name = newMeth.getName().replaceAll("\\..*$", "");//remove file extension
+                    Object newmethod = classLoader.loadClass(name).getConstructors()[0].newInstance();
 
                     classLoader.close();
                     if (newmethod instanceof Var) setVar((Var) newmethod);
