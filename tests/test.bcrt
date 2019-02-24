@@ -2,15 +2,15 @@
     {'a'},
     {~'b'}
 };
-'execute'#{C:/Users/Public/eclipse-workspace/Bracket/methods/Flatten.java};
-'execute'#{C:/Users/Public/eclipse-workspace/Bracket/methods/Print.java};
-'execute'#{C:/Users/Public/eclipse-workspace/Bracket/methods/Remove.java};
-'execute'#{C:/Users/Public/eclipse-workspace/Bracket/methods/Input.java};
-'execute'#{C:/Users/Public/eclipse-workspace/Bracket/tests/base.bcrt};
-'execute'#{C:/Users/Public/eclipse-workspace/Bracket/tests/boolean.bcrt};
-'execute'#{C:/Users/Public/eclipse-workspace/Bracket/tests/loop.bcrt};
-'execute'#{C:/Users/Public/eclipse-workspace/Bracket/tests/inequalities.bcrt};
-'execute'#{C:/Users/Public/eclipse-workspace/Bracket/tests/bit.bcrt};
-'execute'#{C:/Users/Public/eclipse-workspace/Bracket/tests/operations.bcrt};
-'execute'#{C:/Users/Public/eclipse-workspace/Bracket/tests/tests.bcrt};
+'execute'#{methods/Flatten.java};
+'execute'#{methods/Print.java};
+'execute'#{methods/Remove.java};
+'execute'#{methods/Input.java};
+'execute'#{tests/base.bcrt};
+'execute'#{tests/boolean.bcrt};
+'execute'#{tests/loop.bcrt};
+'execute'#{tests/inequalities.bcrt};
+'execute'#{tests/bit.bcrt};
+'execute'#{tests/operations.bcrt};
+'execute'#{tests/tests.bcrt};
 \ 'execute'#{tests/auxtests.bcrt}; \
