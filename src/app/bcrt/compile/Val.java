@@ -25,16 +25,24 @@ public class Val implements Cloneable{
         set(newval);
     }
 
+    public Val(ArrayList<Val> value){
+        this.value = value;
+    }
+
     public void set(){
         value = new ArrayList<>(0);
     }
 
     public void set(String newval){
-        value = new ArrayList<>(8*newval.length());
+        value = new ArrayList<>(newval.length());
         for (int i = 0; i < newval.length(); i++) {
             int charval = newval.toCharArray()[i];
+            ArrayList<Val> character = new ArrayList<>(8);
             for(int j = 0; j < 8; j++)
-                value.add(new Bit((charval>>j)%2 == 1));
+                character.add(new Bit((charval>>j)%2 == 1));
+            Val valchar = new Val();
+            valchar.value = character;
+            value.add(new Val(character));
         }
     }
 
@@ -83,33 +91,30 @@ public class Val implements Cloneable{
     }
 
     public String interpretString(){
-        String ret = "";
-        for (int i = 0; i < value.size(); i+=8) {
-            int ch = 0;
-            for(int j = 0; j < 8; j++)
-                ch += value.get(i+j).interpretInt() << j;
-            ret += (char) ch;
-        }
-        return ret;
+        return value.stream().map(n -> (char) n.interpretInt())
+            .collect(StringBuilder::new,StringBuilder::appendCodePoint,StringBuilder::append)
+            .toString();
     }
 
     public String toString(){
         String ret = "{";
-        if(value.size() > 0 && value.get(0) instanceof Bit){
-            if(value.size() >= 24 && value.size()%8 == 0){
-                ret += interpretString();
-            }else if(value.size() > 2){
-                ret += interpretInt();
-            }
+        if(value.size() > 0){
+            if(value.get(0) instanceof Bit && value.size() > 2) ret += interpretInt();
+            else if(isString()) ret += interpretString();
         }
         if(ret.length() == 1) for(Val v : value) ret += v.toString()+",";
         return ret + "},";
     }
 
+    public boolean isString(){
+        return value.get(0).value.size() == 8 && value.get(0).get(0) instanceof Bit;
+    }
+
     public Val execute(Val context){
         Val ret = null;
-        if(value.size() == 0 || value.get(0) instanceof Bit) return App.execute(interpretString(), context);
-        else for(Val v1 : value) if(v1.value.get(0) instanceof Bit) {
+        if(value.size() == 0 || isString()){
+            return App.execute(interpretString(), context);
+        }else for(Val v1 : value){
             Val toret = v1.execute(context);
             if(toret != null) ret = toret;
         }
