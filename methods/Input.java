@@ -1,11 +1,7 @@
 import app.bcrt.compile.*;
 import javax.swing.JOptionPane;
 
-public class Input extends Var {
-    public Input(){
-        super("input");
-    }
-
+public class Input extends Val {
     public Val execute(Val context){
         Var b = new Var("b");
         String input = JOptionPane.showInputDialog(null, App.get("b").interpretString(), "Input", JOptionPane.INFORMATION_MESSAGE);
@@ -15,7 +11,7 @@ public class Input extends Var {
         return App.get("b");
     }
 
-    protected Var clone(){
+    protected Val clone(){
         return new Input();
     }
 }

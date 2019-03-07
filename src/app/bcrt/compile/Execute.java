@@ -1,16 +1,15 @@
 package app.bcrt.compile;
 
-public class Execute extends Var {
-    public Execute(){
-        super("execute");
-    }
-
+public class Execute extends Val {
     public Val execute(Val context){
-        App.executeFile(App.get("b").interpretString());
-        return App.get("b");
+        Val ret = App.executeFile(App.get("b").interpretString());
+        Val trueret = new Val();
+        trueret.value.add(ret);
+        if(ret != null) App.get("b").set(trueret);
+        return trueret;
     }
 
-    protected Var clone(){
+    protected Val clone(){
         return new Execute();
     }
 }

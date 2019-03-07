@@ -2,12 +2,12 @@
     {'a'},
     {~'b'}
 };
-'execute'#{C:/Users/Public/eclipse-workspace/Bracket/methods/Flatten.java};
+'flatten'@'execute'#{C:/Users/Public/eclipse-workspace/Bracket/methods/Flatten.java};
 'execute'#{C:/Users/Public/eclipse-workspace/Bracket/tests/base.bcrt};
 'path'@{C:/Users/Public/eclipse-workspace/Bracket/}; global path necessary for cmd execution
-'execute'#'path'app{methods/Print.java};
-'execute'#'path'app{methods/Remove.java};
-'execute'#'path'app{methods/Input.java};
+'print'@'execute'#'path'app{methods/Print.java};
+'remove'@'execute'#'path'app{methods/Remove.java};
+'input'@'execute'#'path'app{methods/Input.java};
 'execute'#'path'app{tests/boolean.bcrt};
 'execute'#'path'app{tests/loop.bcrt};
 'execute'#'path'app{tests/inequalities.bcrt};

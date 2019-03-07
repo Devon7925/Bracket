@@ -23,7 +23,9 @@ public class App {
     public static int debugLevel = 0;
 
     public static void main(String[] args) throws IOException {
-        vars.add(new Execute());
+        Var exec = new Var("execute");
+        exec.value.add(new Execute());
+        vars.add(exec);
         interpretArgs(args);
         for(String file : args[args.length-1].split(",")) executeFile(file);
         if(debugLevel >= 1) vars.forEach(System.out::println);
@@ -40,19 +42,19 @@ public class App {
         }
     }
 
-    public static void executeFile(String path) {
+    public static Val executeFile(String path) {
         String[] split  = path.split("\\.");
         if(split.length >= 2){
             String extension = split[split.length-1];
             switch(extension){
                 case "bcrt": loadBcrtMethod(path);
                 break;
-                case "java": loadJavaMethod(path);
-                break;
+                case "java": return loadJavaMethod(path);
                 default:
                 throw new IllegalArgumentException("File type not recognized");
             }
         }else throw new IllegalArgumentException("Input must be path to file");
+        return null;
     }
 
     public static void loadBcrtMethod(String path) {
@@ -60,7 +62,7 @@ public class App {
             execute(line, null);
     }
 
-    public static void loadJavaMethod(String path) {
+    public static Val loadJavaMethod(String path) {
         File newMeth = new File(path);
         if (newMeth.getParentFile().exists() || newMeth.getParentFile().mkdirs()) {
             try {
@@ -80,7 +82,7 @@ public class App {
                     Object newmethod = classLoader.loadClass(name).getConstructors()[0].newInstance();
 
                     classLoader.close();
-                    if (newmethod instanceof Var) setVar((Var) newmethod);
+                    if (newmethod instanceof Val) return (Val) newmethod;
                     else throw new IllegalArgumentException("Improper format");
                 } else {
                     for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
@@ -95,6 +97,7 @@ public class App {
                 e.printStackTrace();
             }
         }
+        return null;
     }
 
     static Val execute(String s, Val context){

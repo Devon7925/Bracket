@@ -2,11 +2,8 @@ import app.bcrt.compile.*;
 import java.util.ArrayList;
 
 
-public class Flatten extends Var {
-    public Flatten(){
-        super("flatten");
-    }
-
+public class Flatten extends Val {
+    @Override
     public Val execute(Val context){
         Val ret = App.get("b");
         int numvalue = 0;
@@ -23,7 +20,7 @@ public class Flatten extends Var {
         return ret;
     }
 
-    protected Var clone(){
+    protected Val clone(){
         return new Flatten();
     }
 }
