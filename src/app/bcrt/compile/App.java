@@ -27,7 +27,7 @@ public class App {
         exec.value.add(new Execute());
         vars.add(exec);
         interpretArgs(args);
-        for(String file : args[args.length-1].split(",")) executeFile(file);
+        for(String file : args[args.length-1].split(",")) executeFile(file, null).execute(null);
         if(debugLevel >= 1) vars.forEach(System.out::println);
     }
 
@@ -42,24 +42,27 @@ public class App {
         }
     }
 
-    public static Val executeFile(String path) {
+    public static Val executeFile(String path, Val context) {
         String[] split  = path.split("\\.");
         if(split.length >= 2){
             String extension = split[split.length-1];
             switch(extension){
-                case "bcrt": loadBcrtMethod(path);
-                break;
+                case "bcrt": return loadBcrtMethod(path, context);
                 case "java": return loadJavaMethod(path);
                 default:
                 throw new IllegalArgumentException("File type not recognized");
             }
         }else throw new IllegalArgumentException("Input must be path to file");
-        return null;
     }
 
-    public static void loadBcrtMethod(String path) {
-        for(String line : StringTool.getCodeLines(path))
-            execute(line, null);
+    public static Val loadBcrtMethod(String path, Val context) {
+        String str = "";
+        try {
+            str = StringTool.fileToString(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return interpret("{"+StringTool.removeComments(str)+"}", context);
     }
 
     public static Val loadJavaMethod(String path) {

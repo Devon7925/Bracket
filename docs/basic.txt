@@ -2,7 +2,6 @@
 @   assign
 {}  value/array
 ,   in betweeen elements of array
-;   end of line
 []  index acess
 ~   return
 ()  group
@@ -13,29 +12,29 @@ abc operation
 
 
 Assign a variable to a value:
-'Variable'@{Value};
+'Variable'@{Value}
 
 Create a method:
-'Method'@{'Variable'@{Value}};
+'Method'@{'Variable'@{Value}}
 
 Execute a method:
-'Method';
+'Method'
 
 MultiLine Method:
 'Method'@{
     {'Variable'@{Value}},
     {'Variable 2'@{Value 2}}
-};
+}
 
 Array:
-'Variable'@{{Value1},{Value2}};
+'Variable'@{{Value1},{Value2}}
 
 Element acess:
-'index 0'@'Variable'[0];
+'index 0'@'Variable'[0]
 note: accessing out of bounds elements will always return a false bit
 
 Varibular acess:
-'index 0'@'Variable'[{0}];
+'index 0'@'Variable'[{0}]
 
 Define operator:
 '&'@{
@@ -43,13 +42,13 @@ Define operator:
     {{'res'@{0}}if'not'['a']},
     {{'res'@{0}}if'not'['b']},
     {~'res'}
-};
+}
 note: ~/return is used here, it can only be used for operations
 note 2: this is the only context local variables exist in as a and b input
 note 3: operations evaluate right to left
 
 Sub element:
-'a'.{something}@{something else};
+'a'.{something}@{something else}
 . acts as an operator and the sub value is the interpretation of the right hand side so
 you can do things like 'a'.{5}+{6} to access 'a'.{11}
 sub elements can also be used for aditional local variables
@@ -57,16 +56,16 @@ sub elements can also be used for aditional local variables
 This syntax:
 : represents this which is the method currently executing
 'ex'@{:.{a}@{1234}}
-'ex';
+'ex'
 'ex'.{a} is now 1234
 
 This as index:
 When used in index notation ('val'[index]) : is the index and the thing in [] becomes a pattern
-'something'@{127}[(:>{1})&:<{4}]; bits 2 and 3 of 127
+'something'@{127}[(:>{1})&:<{4}] bits 2 and 3 of 127
 'something' is now 3
 
 Commenting:
 When commenting syntax characters (Ex. {,},(,),[,],',@) use slashes on both sides
-\'this'.{doesn't}@[cause];(errors)\
+\'this'.{doesn't}@[cause](errors)\
 
 See tests folder for examples

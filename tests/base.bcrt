@@ -1,8 +1,8 @@
-'not'@{{1},{0},{0},{1}}; use index access
-'fix'@{{0},{1},{0},{1}}; use index acess... this is for boolean operations
-'if'@{~{{},'a'}['b']};
-'else'@{
+{'not'@{{1},{0},{0},{1}}}, use index access
+{'fix'@{{0},{1},{0},{1}}}, use index acess... this is for boolean operations
+{'if'@{~{{},'a'}['b']}},
+{'else'@{
     {{{},'b'}['not'['a']]},
     {~'a'}
-};
-'app'@{~'flatten'#{'a', 'b'}};   append two vals  
+}},
+{'app'@{~'flatten'#{'a', 'b'}}}   append two vals  

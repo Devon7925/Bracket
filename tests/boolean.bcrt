@@ -1,18 +1,18 @@
-'&'@{   boolean and
+{'&'@{   boolean and
     {:.{ret}@{1}},
     {{:.{ret}@{0}}if'not'['a']},
     {{:.{ret}@{0}}if'not'['b']},
     {~:.{ret}}
-};
-'|'@{   boolean or
+}},
+{'|'@{   boolean or
     {:.{ret}@{0}},
     {{:.{ret}@{1}}if'fix'['a']},
     {{:.{ret}@{1}}if'fix'['b']},
     {~:.{ret}}
-};
-'xor'@{   boolean xor
+}},
+{'xor'@{   boolean xor
     {:.{ret}@{0}},
     {{:.{ret}@'not'['xor'.{ret}]}if'fix'['a']},
     {{:.{ret}@'not'['xor'.{ret}]}if'fix'['b']},
     {~:.{ret}}
-};
+}}
