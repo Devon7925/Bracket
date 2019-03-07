@@ -16,5 +16,6 @@
                 "git.push"
             ]
         }
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "automatic"
 }
