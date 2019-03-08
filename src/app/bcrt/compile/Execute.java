@@ -1,7 +1,7 @@
 package app.bcrt.compile;
 
 public class Execute extends Val {
-    public Val execute(Val context){
+    public Val execute(Val context) {
         Val ret = App.executeFile(App.get("b").interpretString(), context);
         Val trueret = new Val();
         trueret.value.add(ret);
@@ -9,7 +9,7 @@ public class Execute extends Val {
         return trueret;
     }
 
-    protected Val clone(){
+    protected Val clone() {
         return new Execute();
     }
 }
