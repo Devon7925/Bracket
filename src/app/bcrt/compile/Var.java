@@ -16,6 +16,11 @@ public class Var extends Val {
         this.name = v.name;
     }
 
+    public Var(String name, Val val){
+        this(name);
+        value.add(val);
+    }
+
     public String toString(){
         return name+" - "+super.toString();
     }

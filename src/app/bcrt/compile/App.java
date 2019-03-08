@@ -23,9 +23,7 @@ public class App {
     public static int debugLevel = 0;
 
     public static void main(String[] args) throws IOException {
-        Var exec = new Var("execute");
-        exec.value.add(new Execute());
-        vars.add(exec);
+        vars.add(new Var("execute", new Execute()));
         interpretArgs(args);
         for(String file : args[args.length-1].split(",")) executeFile(file, null).execute(null);
         if(debugLevel >= 1) vars.forEach(System.out::println);
@@ -238,14 +236,8 @@ public class App {
                         }else{
                             Var a = new Var("a");
                             Var b = new Var("b");
-                            if(ret instanceof Var){
-                                a = (Var) ret.clone();
-                                a.name = "a";
-                            }else a.set(ret);
-                            if(tempb instanceof Var){
-                                b = (Var) tempb.clone();
-                                b.name = "b";
-                            }else b.set(tempb);
+                            a.set(ret);
+                            b.set(tempb);
                             Val v = get(operation);
                             vars.add(0, a);
                             vars.add(0, b);

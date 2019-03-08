@@ -14,4 +14,4 @@
 {'execute'#'path'app{tests/bit.bcrt}},
 {'execute'#'path'app{tests/operations.bcrt}},
 {'execute'#'path'app{tests/tests.bcrt}}
-\ 'execute'#{tests/auxtests.bcrt}; \
+\ ,{'execute'#{tests/auxtests.bcrt}} \
