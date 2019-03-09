@@ -5,13 +5,15 @@
 {'flatten'@'execute'#{C:/Users/Public/eclipse-workspace/Bracket/methods/Flatten.java}},
 {'execute'#{C:/Users/Public/eclipse-workspace/Bracket/tests/base.bcrt}},
 {'path'@{C:/Users/Public/eclipse-workspace/Bracket/}},global path necessary for cmd execution
-{'print'@'execute'#'path'app{methods/Print.java}},
-{'remove'@'execute'#'path'app{methods/Remove.java}},
-{'input'@'execute'#'path'app{methods/Input.java}},
-{'execute'#'path'app{tests/boolean.bcrt}},
-{'execute'#'path'app{tests/loop.bcrt}},
-{'execute'#'path'app{tests/inequalities.bcrt}},
-{'execute'#'path'app{tests/bit.bcrt}},
-{'execute'#'path'app{tests/operations.bcrt}},
-{'execute'#'path'app{tests/tests.bcrt}}
+{'methpath'@'path'app{methods/}},
+{'print'@'execute'#'methpath'app{Print.java}},
+{'remove'@'execute'#'methpath'app{Remove.java}},
+{'input'@'execute'#'methpath'app{Input.java}},
+{'testpath'@'path'app{tests/}},
+{'execute'#'testpath'app{boolean.bcrt}},
+{'execute'#'testpath'app{loop.bcrt}},
+{'execute'#'testpath'app{inequalities.bcrt}},
+{'execute'#'testpath'app{bit.bcrt}},
+{'execute'#'testpath'app{operations.bcrt}},
+{'execute'#'testpath'app{tests.bcrt}}
 \ ,{'execute'#{tests/auxtests.bcrt}} \

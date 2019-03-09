@@ -1,6 +1,7 @@
 package app.bcrt.compile;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Val implements Cloneable {
 
@@ -116,6 +117,125 @@ public class Val implements Cloneable {
         } else for(Val v1 : value) {
             Val toret = v1.execute(context);
             if(toret != null) ret = toret;
+        }
+        return ret;
+    }
+
+    public Val interpret(String s) {
+        s += ";";
+        Val ret = null;
+        Mode mode = Mode.START;
+        int bracketlevel = 0;
+        String current = "";
+        String operation = "";
+        for(char c : s.toCharArray()) {
+            switch(c) {
+                case '{':
+                case '[':
+                case '(':
+                    bracketlevel++;
+                    break;
+                case '}':
+                case ']':
+                case ')':
+                    bracketlevel--;
+                    break;
+            }
+            switch(mode) {
+                case START:
+                    if(c == '{') mode = Mode.VALUE;
+                    else if(c == '\'') mode = Mode.VARIABLE;
+                    else if(c == '(') mode = Mode.PARENTHESIS;
+                    else if(c == ':') {
+                        ret = this;
+                        mode = Mode.MODIFIER;
+                    }
+                    break;
+                case VALUE:
+                    if(bracketlevel == 0) {
+                        if(StringTool.isList(current)) {
+                            ret = new Val();
+                            ret.value = new ArrayList<>(
+                                    StringTool.stringToElems(current).stream().map(n -> interpret(n).clone()).collect(Collectors.toList()));
+                        } else ret = new Val(current);
+                        current = "";
+                        mode = Mode.MODIFIER;
+                    }
+                    current += c;
+                    break;
+                case VARIABLE:
+                    if(c == '\'') {
+                        ret = App.get(current);
+                        if(ret == null) ret = new Var(current);
+                        current = "";
+                        mode = Mode.MODIFIER;
+                        break;
+                    }
+                    current += c;
+                    break;
+                case MODIFIER:// read what to do with ret
+                    if(c == '[') {
+                        current = "";
+                        mode = Mode.INDEX;
+                    } else {
+                        current = "" + c;
+                        mode = Mode.OPERATION;
+                    }
+                    break;
+                case INDEX: // read index acess
+                    if(bracketlevel == 0) {
+                        if(current.matches("\\d+")) ret = ret.get(Integer.parseInt(current));
+                        else if(current.contains(":")) {
+                            Val filteredval = new Val();
+                            for(int i = 0; i < ret.value.size(); i++)
+                                if(new Val(i).interpret(current).interpretInt() == 1) filteredval.value.add(ret.value.get(i).clone());
+                            ret = filteredval;
+                        } else ret = ret.get(interpret(current).interpretInt());
+                        current = "";
+                        mode = Mode.MODIFIER;
+                        break;
+                    }
+                    current += c;
+                    break;
+                case OPERATION:// read operation
+                    if(c == '{' || c == '\'' || c == '(' || c == ':') {
+                        mode = Mode.INPUT2;
+                        operation = current;
+                        current = "";
+                    }
+                    current += c;
+                    break;
+                case INPUT2:// read second input and execute operation
+                    if(c == ';') {
+                        Val tempb = interpret(current);
+                        if(operation.equals(".")) {
+                            ret = ((Var) ret).get(tempb.toString());
+                        } else {
+                            Var a = new Var("a");
+                            Var b = new Var("b");
+                            a.set(ret);
+                            b.set(tempb);
+                            Val v = App.get(operation);
+                            App.vars.add(0, a);
+                            App.vars.add(0, b);
+                            ret = v.execute(v);
+                            App.vars.remove(0);
+                            App.vars.remove(0);
+                        }
+                    }
+                    current += c;
+                    break;
+                case PARENTHESIS:// end paren
+                    if(bracketlevel == 0) {
+                        ret = interpret(current);
+                        current = "";
+                        mode = Mode.MODIFIER;
+                    }
+                    current += c;
+                    break;
+                default:
+                    System.err.println("Something very wrong happened");
+            }
         }
         return ret;
     }

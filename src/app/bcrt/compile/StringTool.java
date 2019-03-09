@@ -51,29 +51,31 @@ public class StringTool {
         return ret;
     }
 
-    static String fileToString(String file) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
+    static String fileToString(String file) {
+        BufferedReader reader = null;
         String line = null;
         StringBuilder stringBuilder = new StringBuilder();
         String ls = System.getProperty("line.separator");
         try {
+            reader = new BufferedReader(new FileReader(file));
             while((line = reader.readLine()) != null) {
                 stringBuilder.append(line);
                 stringBuilder.append(ls);
             }
             stringBuilder.delete(stringBuilder.lastIndexOf(ls), stringBuilder.length());
-            return stringBuilder.toString();
-        } finally {
-            reader.close();
-        }
-    }
-
-    static String[] getCodeLines(String path) {
-        try {
-            return StringTool.removeComments(fileToString(path)).split(";");
         } catch (IOException e) {
             e.printStackTrace();
-            return new String[0];
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        return stringBuilder.toString();
+    }
+
+    static String getCode(String path) {
+        return StringTool.removeComments(fileToString(path));
     }
 }
