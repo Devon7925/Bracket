@@ -3,12 +3,12 @@ import javax.swing.JOptionPane;
 
 public class Input extends Val {
     public Val execute(Val context){
-        Var b = new Var("b");
-        String input = JOptionPane.showInputDialog(null, App.get("b").interpretString(), "Input", JOptionPane.INFORMATION_MESSAGE);
-        if(input.matches("\\d+")) b.set(Integer.parseInt(input));
-        else b.set(input);
-        App.setVar(b);
-        return App.get("b");
+        Var result = new Var(new Val("b").toString());
+        String input = JOptionPane.showInputDialog(null, App.get(new Val("b").toString()).interpretString(), "Input", JOptionPane.INFORMATION_MESSAGE);
+        if(input.matches("\\d+")) result.set(Integer.parseInt(input));
+        else result.set(input);
+        App.setVar(result);
+        return App.get(new Val("b").toString());
     }
 
     protected Val clone(){

@@ -1,13 +1,11 @@
 package app.bcrt.compile;
 
-import java.util.ArrayList;
-
 class Bit extends Val {
 
-    boolean b;
+    boolean bit;
 
     Bit(boolean b) {
-        this.b = b;
+        this.bit = b;
     }
 
     Bit(Val v) {
@@ -15,21 +13,20 @@ class Bit extends Val {
     }
 
     int interpretInt() {
-        return b ? 1 : 0;
+        return bit ? 1 : 0;
     }
 
     public void set(Val newval) {
         if(newval instanceof Bit) {
-            b = ((Bit) newval).b;
+            bit = ((Bit) newval).bit;
             return;
         }
-        this.b = ((Bit) newval.value.get(0)).b;
-        this.subelems = new ArrayList<>(newval.subelems.size());
-        newval.subelems.stream().map(n -> n.clone()).forEach(subelems::add);
+        this.bit = ((Bit) newval.value.get(0)).bit;
+        super.set(newval);
     }
 
     public String toString() {
-        return b ? "T" : "F";
+        return bit ? "T" : "F";
     }
 
     protected Bit clone() {

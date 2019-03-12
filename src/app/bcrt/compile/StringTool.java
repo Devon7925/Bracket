@@ -53,10 +53,10 @@ public class StringTool {
 
     static String fileToString(String file) {
         BufferedReader reader = null;
-        String line = null;
         StringBuilder stringBuilder = new StringBuilder();
         String ls = System.getProperty("line.separator");
         try {
+            String line = null;
             reader = new BufferedReader(new FileReader(file));
             while((line = reader.readLine()) != null) {
                 stringBuilder.append(line);

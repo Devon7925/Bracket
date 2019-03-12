@@ -6,13 +6,13 @@ import java.util.Arrays;
 
 public class App {
 
-    public static final ArrayList<Var> vars = new ArrayList<>(Arrays.asList(new Var("execute", new Execute())));
+    public static final ArrayList<Var> vars = new ArrayList<>(Arrays.asList(new Var(new Val("execute").toString(), new Load())));
 
     public static int debugLevel = 0;
 
     public static void main(String[] args) throws IOException {
         interpretArgs(args);
-        Val root = new Val();
+        Var root = new Var("root");
         Loader.loadFile(args[args.length - 1], root).execute(root);
         if(debugLevel >= 1) vars.forEach(System.out::println);
     }
@@ -75,7 +75,7 @@ public class App {
         return null;
     }
 
-    public static Val get(String name) {
+    public static Var get(String name) {
         return vars.stream().filter(n -> n.name.equals(name)).findAny().orElse(null);
     }
 
