@@ -3,15 +3,15 @@
     'a',
     {{'dowhile'}if{}b{}}
 }},
-{'whil'@{   is NOT an operation
+{'whil'@{     is NOT an operation
     {'condition'@'b'.{d}},
-    {{'dowhil'}if'a'condition'b'},
+    {'dowhil'if'a'condition'b'},
     {'remove'#{condition}}
 }},
 {'dowhil'@{   is NOT an operation
     {'b'.{c}},
     {'condition'@'b'.{d}},
-    {{'dowhil'}if'a'condition'b'},
+    {'dowhil'if'a'condition'b'},
     {'remove'#{condition}}
 }},
 {'for'@{

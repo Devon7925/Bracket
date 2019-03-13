@@ -11,10 +11,10 @@
 {'input'@'execute'#'methpath'app{Input.java}},
 {'testpath'@'path'app{tests/}},
 {'execute'#'testpath'app{boolean.bcrt}},
-{'execute'#'testpath'app{loop.bcrt}},
 {'print'#{hi}},
 {'execute'#'testpath'app{inequalities.bcrt}},
 {'execute'#'testpath'app{bit.bcrt}},
 {'execute'#'testpath'app{operations.bcrt}},
+{'execute'#'testpath'app{loop.bcrt}},
 {'execute'#'testpath'app{tests.bcrt}}
 \ ,{'execute'#{tests/auxtests.bcrt}} \

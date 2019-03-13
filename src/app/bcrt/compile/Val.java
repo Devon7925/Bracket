@@ -27,6 +27,7 @@ public class Val implements Cloneable {
 
     public Val(Val newval) {
         set(newval);
+        holder = newval.holder;
     }
 
     public Val(ArrayList<Val> value) {
@@ -87,22 +88,37 @@ public class Val implements Cloneable {
         }
     };
 
-    public Var get(String s) {
-        Optional<Var> newvar = subelems.stream().filter(n -> n.name.equals(s)).findAny();
+    public Var get(String name) {
+        Optional<Var> newvar = subelems.stream().filter(n -> n.name.equals(name)).findAny();
         Var v;
         if(newvar.isPresent()) v = newvar.get();
         else {
             Var extv;
-            if(holder == null) extv = App.get(s);
-            else extv = holder.get(s);
+            if(holder == null) extv = App.get(name);
+            else {
+                extv = holder.get(name);
+                if(extv != null) {
+                    if(this instanceof Var) extv.holder = ((Var) this);
+                    else extv.holder = holder;
+                }
+            }
 
             if(extv == null) {
-                v = new Var(s);
+                v = new Var(name);
                 subelems.add(v);
             } else v = extv;
         }
-        if(this instanceof Var) v.holder = ((Var) this);
-        else v.holder = holder;
+        return v;
+    }
+
+    public Var getLocal(String name) {
+        Var extv = subelems.stream().filter(n -> n.name.equals(name)).findAny().orElse(null);
+        Var v;
+        if(extv == null) {
+            v = new Var(name);
+            v.holder = getVarHolder();
+            subelems.add(v);
+        } else v = extv;
         return v;
     }
 
@@ -134,23 +150,22 @@ public class Val implements Cloneable {
 
     public Val execute(Val context) {
         Val ret = null;
-        if(value.size() == 0 || isString()) {
-            return App.execute(interpretString(), context);
-        } else for(Val v1 : value) {
+        if(value.size() == 0 || isString()) return App.execute(interpretString(), context);
+        else for(Val v1 : value) {
             Val toret = v1.execute(context);
             if(toret != null) ret = toret;
         }
         return ret;
     }
 
-    public Val interpret(String s) {
-        s += ";";
+    public Val interpret(String code) {
+        code += ";";
         Val result = null;
         Mode mode = Mode.START;
         int bracketlevel = 0;
         String readString = "";
         String operation = "";
-        for(char c : s.toCharArray()) {
+        for(char c : code.toCharArray()) {
             switch(c) {
                 case '{':
                 case '[':
@@ -233,7 +248,7 @@ public class Val implements Cloneable {
                 case OP_ARG_2:// read second input and execute operation
                     if(c == ';') {
                         Val tempb = interpret(readString);
-                        if(operation.equals(new Val(".").toString())) result = ((Var) result).get(tempb.toString());
+                        if(operation.equals(new Val(".").toString())) result = ((Var) result).getLocal(tempb.toString());
                         else {
                             Var a = new Var(new Val("a").toString());
                             Var b = new Var(new Val("b").toString());
