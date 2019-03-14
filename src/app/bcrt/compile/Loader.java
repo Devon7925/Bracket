@@ -11,8 +11,8 @@ import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+
 class Loader {
     public static Val loadFile(String path, Val context) {
         String[] splitByDot = path.split("\\.");
@@ -30,38 +30,38 @@ class Loader {
     }
 
     public static Val loadBcrtMethod(String path, Val context) {
-        Val ret = context.interpret("{" + StringTool.getCode(path) + "}");
+        Val ret = context.interpret("{" + AppTool.getCode(path) + "}");
         ret.holder = context.getVarHolder();
         return ret;
     }
 
     public static Val loadJavaMethod(String path, Val context) {
         File newMeth = new File(path);
-        if(newMeth.getParentFile().exists() || newMeth.getParentFile().mkdirs()) {
+        File parent = newMeth.getParentFile();
+        if(parent.exists() || parent.mkdirs()) {
             try {
                 // Compilation Requirements
-                DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
-                JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-                StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
+                var diagnostics = new DiagnosticCollector<JavaFileObject>();
+                var compiler = ToolProvider.getSystemJavaCompiler();
+                var fileManager = compiler.getStandardFileManager(diagnostics, null, null);
 
                 Iterable<? extends JavaFileObject> compilationUnit = fileManager.getJavaFileObjectsFromFiles(Arrays.asList(newMeth));
                 JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, compilationUnit);
                 if(task.call()) {
                     // Load and execute
-                    URLClassLoader classLoader = new URLClassLoader(new URL[] { newMeth.getParentFile().toURI().toURL() });
+                    var classLoader = new URLClassLoader(new URL[] { newMeth.getParentFile().toURI().toURL() });
                     String name = newMeth.getName().replaceAll("\\..*$", ""); // remove file extension
                     Object newmethod = classLoader.loadClass(name).getConstructors()[0].newInstance();
 
                     classLoader.close();
-                    if(newmethod instanceof Val){
+                    if(newmethod instanceof Val) {
                         Val result = (Val) newmethod;
                         result.holder = context.getVarHolder();
                         return result;
                     } else throw new IllegalArgumentException("Improper format");
                 } else {
-                    for(Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
+                    for(Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics())
                         System.err.format("Error on line %d in %s%n", diagnostic.getLineNumber(), diagnostic.getSource().toUri());
-                    }
                 }
                 fileManager.close();
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | SecurityException | IOException e) {

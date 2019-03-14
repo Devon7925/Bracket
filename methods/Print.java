@@ -2,9 +2,9 @@ import app.bcrt.compile.*;
 
 public class Print extends Val {
     public Val execute(Val context){
-        System.out.println(new Val(App.get(new Val("b").toString())));
-        App.setVar(new Var(new Val("b").toString()));
-        return App.get(new Val("b").toString());
+        System.out.println(new Val(App.get(AppTool.litToVal("b"))));
+        App.setVar(new Var(AppTool.litToVal("b")));
+        return App.get(AppTool.litToVal("b"));
     }
 
     protected Val clone(){

@@ -3,27 +3,28 @@ package app.bcrt.compile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class App {
 
-    public static final ArrayList<Var> vars = new ArrayList<>(Arrays.asList(new Var(new Val("execute").toString(), new Load())));
+    public static final List<Var> vars = new ArrayList<>(Arrays.asList(new Var(AppTool.litToVal("execute"), new Load())));
 
     public static int debugLevel = 0;
 
     public static void main(String[] args) throws IOException {
-        interpretArgs(args);
         Var root = new Var("root");
-        Loader.loadFile(args[args.length - 1], root).execute(root);
+        Loader.loadFile(interpretArgs(args), root).execute(root);
         if(debugLevel >= 1) vars.forEach(System.out::println);
     }
 
-    public static void interpretArgs(String[] args) {
+    public static String interpretArgs(String[] args) {
         for(int i = 0; i < args.length - 1; i++)
             if(args[i].equals("-d")) {
                 String debug = args[++i];
                 if(debug.matches("\\d+")) debugLevel = Integer.parseInt(debug);
                 else throw new IllegalArgumentException("Debug level must be integer");
             }
+        return args[args.length - 1];
     }
 
     static Val execute(String s, Val context) {
@@ -59,8 +60,8 @@ public class App {
                     break;
                 case ASSIGN:
                     if(c == ';') {
-                        tempval.set(context.interpret(current));
-                        if(tempval instanceof Var && ((Var) tempval).holder == null) setVar((Var) tempval);
+                        tempval.set(new Val(context.interpret(current)));
+                        if(tempval instanceof Var && tempval.holder == null) setVar((Var) tempval);
                         return null;
                     }
                     break;

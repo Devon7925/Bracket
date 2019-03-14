@@ -4,9 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
-public class StringTool {
-    static boolean isList(String s) {
+public class AppTool {
+    public static boolean isList(String s) {
         int bracketlevel = 0;
         for(char c : s.toCharArray()) {
             if(c == '{') bracketlevel++;
@@ -16,9 +17,9 @@ public class StringTool {
         return false;
     }
 
-    static ArrayList<String> stringToElems(String s) {
+    public static List<String> stringToElems(String s) {
         int bracketlevel = 0;
-        ArrayList<String> ret = new ArrayList<>();
+        List<String> ret = new ArrayList<>();
         String temp = "";
         for(char c : s.toCharArray()) {
             if(c == '{') bracketlevel++;
@@ -32,7 +33,7 @@ public class StringTool {
         return ret;
     }
 
-    static String removeComments(String code) {
+    public static String removeComments(String code) {
         int bracketlevel = 0;
         boolean invar = false;
         String ret = "";
@@ -51,9 +52,9 @@ public class StringTool {
         return ret;
     }
 
-    static String fileToString(String file) {
+    public static String fileToString(String file) {
         BufferedReader reader = null;
-        StringBuilder stringBuilder = new StringBuilder();
+        var stringBuilder = new StringBuilder();
         String ls = System.getProperty("line.separator");
         try {
             String line = null;
@@ -75,7 +76,15 @@ public class StringTool {
         return stringBuilder.toString();
     }
 
-    static String getCode(String path) {
-        return StringTool.removeComments(fileToString(path));
+    public static String getCode(String path) {
+        return AppTool.removeComments(fileToString(path));
+    }
+
+    public static String litToVal(String literal) {
+        return new Val(literal).toString();
+    }
+    
+    public static double log(double base, double val){
+        return Math.log(val) / Math.log(base);
     }
 }

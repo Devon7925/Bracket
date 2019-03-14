@@ -18,5 +18,6 @@
         }
     ],
     "java.configuration.updateBuildConfiguration": "automatic",
-    "java.format.settings.url": "eclipse-formatter.xml"
+    "java.format.settings.url": "eclipse-formatter.xml",
+    "search.usePCRE2": true
 }

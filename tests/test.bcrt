@@ -11,10 +11,23 @@
 {'input'@'execute'#'methpath'app{Input.java}},
 {'testpath'@'path'app{tests/}},
 {'execute'#'testpath'app{boolean.bcrt}},
-{'print'#{hi}},
 {'execute'#'testpath'app{inequalities.bcrt}},
 {'execute'#'testpath'app{bit.bcrt}},
 {'execute'#'testpath'app{operations.bcrt}},
 {'execute'#'testpath'app{loop.bcrt}},
-{'execute'#'testpath'app{tests.bcrt}}
+{'b'@{3}},
+{'t'@{0}},
+{'b'.{i}@{0}},
+{'b'.{c}@{
+    {'b'['b'.{i}]@{0}}, 
+    {'b'.{i}@'inc'#('b'.{i})},
+    {'t'@'inc'#'t'}
+}},
+{'b'.{d}@{~'b'['b'.{i}]}},
+{'whil'},
+{'b'['b'.{i}]@{1}},
+{'print'#'b'},
+{'print'#'t'},
+{'print'#'b'.{i}}
+\ ,{'execute'#'testpath'app{tests.bcrt}} \
 \ ,{'execute'#{tests/auxtests.bcrt}} \

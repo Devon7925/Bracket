@@ -1,6 +1,7 @@
 package app.bcrt.compile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -8,7 +9,7 @@ import java.util.stream.Collectors;
 public class Val implements Cloneable {
 
     public List<Val> value;
-    List<Var> subelems = new ArrayList<>(0);
+    List<Var> subelems;
     Var holder = null;
 
     public Val() {
@@ -16,56 +17,56 @@ public class Val implements Cloneable {
     }
 
     public Val(String newval) {
+        this();
         if(newval.equals("")) set();
         else if(newval.matches("\\d+")) set(Integer.parseInt(newval));
         else set(newval);
     }
 
     public Val(int newval) {
+        this();
         set(newval);
     }
 
     public Val(Val newval) {
+        this();
         set(newval);
         holder = newval.holder;
     }
 
-    public Val(ArrayList<Val> value) {
+    public Val(List<Val> value) {
+        this();
         this.value = value;
     }
 
     public void set() {
         value = new ArrayList<>(0);
+        subelems = new ArrayList<>(0);
     }
 
     public void set(String newval) {
         value = new ArrayList<>(newval.length());
-        for(int i = 0; i < newval.length(); i++) {
-            int charval = newval.toCharArray()[i];
-            ArrayList<Val> character = new ArrayList<>(8);
-            for(int j = 0; j < 8; j++)
-                character.add(new Bit((charval >> j) % 2 == 1));
-            Val valchar = new Val();
-            valchar.value = character;
+        for(char c : newval.toCharArray()) {
+            List<Val> character = new ArrayList<>(8);
+            for(int digit = 0; digit < 8; digit++)
+                character.add(new Bit((c >> digit) % 2 == 1));
             value.add(new Val(character));
         }
     }
 
     public void set(int newval) {
         if(newval == 0) {
-            value = new ArrayList<Val>(1);
-            value.add(new Bit(false));
+            value = Arrays.asList(new Bit(false));
             return;
         }
-        int digits = (int) Math.floor(Math.log(newval) / Math.log(2)) + 1;
-        value = new ArrayList<>(digits);
-        for(int i = 0; i < digits; i++)
-            value.add(new Bit((newval >> i) % 2 == 1));
+        int numOfDigits = (int) Math.floor(AppTool.log(2, newval)) + 1;
+        value = new ArrayList<>(numOfDigits);
+        for(int digit = 0; digit < numOfDigits; digit++)
+            value.add(new Bit((newval >> digit) % 2 == 1));
     }
 
     public void set(Bit newval) {
-        value = new ArrayList<Val>(1);
-        value.add(new Bit(newval));
+        value = Arrays.asList(newval);
     }
 
     public void set(Val newval) {
@@ -73,10 +74,8 @@ public class Val implements Cloneable {
             set((Bit) newval);
             return;
         }
-        this.value = new ArrayList<>(newval.value.size());
-        newval.value.stream().map(n -> n.clone()).forEach(value::add);
-        this.subelems = new ArrayList<>(newval.subelems.size());
-        newval.subelems.stream().map(n -> n.clone()).forEach(subelems::add);
+        this.value = newval.value.stream().map(n -> n.clone()).collect(Collectors.toList());
+        this.subelems = newval.subelems.stream().map(n -> n.clone()).collect(Collectors.toList());
     }
 
     Val get(int index) {
@@ -90,72 +89,70 @@ public class Val implements Cloneable {
 
     public Var get(String name) {
         Optional<Var> newvar = subelems.stream().filter(n -> n.name.equals(name)).findAny();
-        Var v;
-        if(newvar.isPresent()) v = newvar.get();
+        if(newvar.isPresent()) return newvar.get();
         else {
-            Var extv;
-            if(holder == null) extv = App.get(name);
-            else {
-                extv = holder.get(name);
-                if(extv != null) {
-                    if(this instanceof Var) extv.holder = ((Var) this);
-                    else extv.holder = holder;
-                }
-            }
+            Var extv = (holder == null) ? App.get(name) : holder.get(name);
 
             if(extv == null) {
-                v = new Var(name);
+                Var v = new Var(name);
                 subelems.add(v);
-            } else v = extv;
+                return v;
+            } else return extv;
         }
-        return v;
     }
 
     public Var getLocal(String name) {
         Var extv = subelems.stream().filter(n -> n.name.equals(name)).findAny().orElse(null);
-        Var v;
         if(extv == null) {
-            v = new Var(name);
+            Var v = new Var(name);
             v.holder = getVarHolder();
             subelems.add(v);
-        } else v = extv;
-        return v;
+            return v;
+        }
+        return extv;
     }
 
-    int interpretInt() {
-        int ret = 0;
+    int asInt() {
+        int result = 0;
         for(int i = 0; i < value.size(); i++)
-            ret += value.get(i).interpretInt() << i;
-        return ret;
+            result += value.get(i).asInt() << i;
+        return result;
     }
 
-    public String interpretString() {
-        return value.stream().map(n -> (char) n.interpretInt()).collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
+    public String asString() {
+        return value.stream().map(n -> (char) n.asInt()).collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
     }
 
     public String toString() {
-        String ret = "{";
         if(value.size() > 0) {
-            if(value.get(0) instanceof Bit && value.size() > 2) ret += interpretInt();
-            else if(isString()) ret += interpretString();
+            if(value.get(0) instanceof Bit && value.size() > 2) return "{" + asInt() + "},";
+            else if(isString()) return "{" + asString() + "},";
         }
-        if(ret.length() == 1) for(Val v : value)
-            ret += v.toString() + ",";
-        return ret + "},";
+        return value.stream().map(v -> v.toString()).collect(Collectors.joining(",", "{", "},"));
     }
 
     public boolean isString() {
-        return value.get(0).value.size() == 8 && value.get(0).get(0) instanceof Bit;
+        return value.stream().allMatch(n -> n.isChar());
+    }
+
+    public boolean isChar() {
+        return value.size() == 8 && value.stream().allMatch(n -> n instanceof Bit);
+    }
+
+    public Val filter(String condition) {
+        Val filteredval = new Val();
+        for(int i = 0; i < value.size(); i++)
+            if(new Val(i).interpret(condition).asInt() == 1) filteredval.value.add(value.get(i).clone());
+        return filteredval;
+    }
+
+    public List<Val> elemsToVals(List<String> elems) {
+        return elems.stream().map(this::interpret).map(n -> n.clone()).collect(Collectors.toList());
     }
 
     public Val execute(Val context) {
-        Val ret = null;
-        if(value.size() == 0 || isString()) return App.execute(interpretString(), context);
-        else for(Val v1 : value) {
-            Val toret = v1.execute(context);
-            if(toret != null) ret = toret;
-        }
-        return ret;
+        return (value.size() == 0 || isString()) ? App.execute(asString(), context)
+                : value.stream().map(v -> v.execute(context)).filter(n -> n != null).findAny().orElse(null);
     }
 
     public Val interpret(String code) {
@@ -166,18 +163,8 @@ public class Val implements Cloneable {
         String readString = "";
         String operation = "";
         for(char c : code.toCharArray()) {
-            switch(c) {
-                case '{':
-                case '[':
-                case '(':
-                    bracketlevel++;
-                    break;
-                case '}':
-                case ']':
-                case ')':
-                    bracketlevel--;
-                    break;
-            }
+            if((c + "").matches("[\\[{(]")) bracketlevel++;
+            if((c + "").matches("[\\]})]")) bracketlevel--;
             switch(mode) {
                 case START:
                     if(c == '{') mode = Mode.VALUE;
@@ -193,10 +180,7 @@ public class Val implements Cloneable {
                     break;
                 case VALUE:
                     if(bracketlevel == 0) {
-                        if(StringTool.isList(readString)) {
-                            result = new Val();
-                            result.value = StringTool.stringToElems(readString).stream().map(this::interpret).map(n -> n.clone()).collect(Collectors.toList());
-                        } else result = new Val(readString);
+                        result = AppTool.isList(readString) ? new Val(elemsToVals(AppTool.stringToElems(readString))) : new Val(readString);
                         readString = "";
                         mode = Mode.MODIFIER;
                     }
@@ -204,7 +188,7 @@ public class Val implements Cloneable {
                     break;
                 case VARIABLE:
                     if(c == '\'') {
-                        String name = new Val(readString).toString();
+                        String name = AppTool.litToVal(readString);
                         result = get(name);
                         if(result == null) result = new Var(name);
                         readString = "";
@@ -225,12 +209,8 @@ public class Val implements Cloneable {
                 case INDEX: // read index acess
                     if(bracketlevel == 0) {
                         if(readString.matches("\\d+")) result = result.get(Integer.parseInt(readString));
-                        else if(readString.contains(":")) {
-                            Val filteredval = new Val();
-                            for(int i = 0; i < result.value.size(); i++)
-                                if(new Val(i).interpret(readString).interpretInt() == 1) filteredval.value.add(result.value.get(i).clone());
-                            result = filteredval;
-                        } else result = result.get(interpret(readString).interpretInt());
+                        else if(readString.contains(":")) result = result.filter(readString);
+                        else result = result.get(interpret(readString).asInt());
                         readString = "";
                         mode = Mode.MODIFIER;
                         break;
@@ -238,9 +218,9 @@ public class Val implements Cloneable {
                     readString += c;
                     break;
                 case OPERATION:// read operation
-                    if(c == '{' || c == '\'' || c == '(' || c == ':') {
+                    if(("" + c).matches("[{'(:]")) {
                         mode = Mode.OP_ARG_2;
-                        operation = new Val(readString).toString();
+                        operation = AppTool.litToVal(readString);
                         readString = "";
                     }
                     readString += c;
@@ -248,18 +228,16 @@ public class Val implements Cloneable {
                 case OP_ARG_2:// read second input and execute operation
                     if(c == ';') {
                         Val tempb = interpret(readString);
-                        if(operation.equals(new Val(".").toString())) result = ((Var) result).getLocal(tempb.toString());
+                        if(operation.equals(AppTool.litToVal("."))) result = ((Var) result).getLocal(tempb.toString());
                         else {
-                            Var a = new Var(new Val("a").toString());
-                            Var b = new Var(new Val("b").toString());
+                            Var a = new Var(AppTool.litToVal("a"));
+                            Var b = new Var(AppTool.litToVal("b"));
                             a.set(result);
                             b.set(tempb);
                             Val v = get(operation);
-                            App.vars.add(0, a);
-                            App.vars.add(0, b);
+                            App.vars.addAll(0, Arrays.asList(a, b));
                             result = v.execute(v);
-                            App.vars.remove(a);
-                            App.vars.remove(b);
+                            App.vars.removeAll(Arrays.asList(a, b));
                         }
                     }
                     readString += c;
@@ -280,8 +258,7 @@ public class Val implements Cloneable {
     }
 
     public Var getVarHolder() {
-        if(this instanceof Var) return (Var) this;
-        else return holder.getVarHolder();
+        return (this instanceof Var) ? (Var) this : holder.getVarHolder();
     }
 
     protected Val clone() {
