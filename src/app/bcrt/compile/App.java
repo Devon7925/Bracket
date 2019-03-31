@@ -10,7 +10,7 @@ public class App extends AppTool {
 
     public App(Val v) {
         root = v;
-        root.subAssign("load", new Load(root));
+        root.subAssign(litToVal("load"), new Load(root));
         root.execute();
         if(debugLevel >= 1) root.subelems.entrySet().stream().map(n -> n.getKey() + " - " + n.getValue().toString()).forEach(System.out::println);
     }

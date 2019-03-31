@@ -18,6 +18,7 @@ class Bit extends Val {
         set(v);
     }
 
+    @Override
     int asInt() {
         return bit ? 1 : 0;
     }

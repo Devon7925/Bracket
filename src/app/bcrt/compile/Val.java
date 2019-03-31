@@ -12,7 +12,7 @@ public class Val extends AppTool implements Cloneable {
 
     public List<Val> value;
     public Map<String, Val> subelems;
-    Val holder;
+    public Val holder;
 
     public Val(Val holder) {
         this.holder = holder;
@@ -70,17 +70,9 @@ public class Val extends AppTool implements Cloneable {
             value.add(new Bit(this, (newval >> digit) % 2 == 1));
     }
 
-    public void set(Bit newval) {
-        value = Arrays.asList(newval);
-    }
-
     public void set(Val newval) {
-        if(newval instanceof Bit) {
-            set((Bit) newval);
-            return;
-        }
-        this.value = newval.value.stream().map(n -> n.clone()).collect(Collectors.toList());
-        this.subelems = newval.subelems.entrySet().stream().collect(Collectors.toMap(n -> n.getKey(), n -> n.getValue().clone()));
+        this.value = newval.value.stream().map(n -> n.clone()).map(n -> {n.holder = this; return n;}).collect(Collectors.toList());
+        this.subelems = newval.subelems.entrySet().stream().collect(Collectors.toMap(n -> n.getKey(), n -> {Val temp = n.getValue().clone(); temp.holder = this; return temp;}));
     }
 
     Val get(int index) {

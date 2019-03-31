@@ -1,13 +1,18 @@
 import app.bcrt.compile.*;
+import java.util.Optional;
 
 public class Print extends Val {
-    public Val execute(Val context){
-        System.out.println(new Val(App.get(AppTool.litToVal("b"))));
-        App.setVar(new Var(AppTool.litToVal("b")));
-        return App.get(AppTool.litToVal("b"));
+    public Print(Val holder) {
+        super(holder);
+    }
+
+    @Override
+    public Optional<Val> execute(){
+        System.out.println(new Val(get(litToVal("b"))));
+        return Optional.of(get(litToVal("b")));
     }
 
     protected Val clone(){
-        return new Print();
+        return new Print(holder);
     }
 }

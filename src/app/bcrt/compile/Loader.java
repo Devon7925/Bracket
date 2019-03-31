@@ -51,7 +51,7 @@ public class Loader extends AppTool {
                     // Load and execute
                     var classLoader = new URLClassLoader(new URL[] { newMeth.getParentFile().toURI().toURL() });
                     String name = newMeth.getName().replaceAll("\\..*$", ""); // remove file extension
-                    Object newmethod = classLoader.loadClass(name).getConstructors()[0].newInstance();
+                    Object newmethod = classLoader.loadClass(name).getConstructor(Val.class).newInstance(context);
 
                     classLoader.close();
                     if(newmethod instanceof Val) {
@@ -61,10 +61,11 @@ public class Loader extends AppTool {
                     } else throw new IllegalArgumentException("Improper format");
                 } else {
                     for(Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics())
-                        System.err.format("Error on line %d in %s%n", diagnostic.getLineNumber(), diagnostic.getSource().toUri());
+                        System.err.format("Error on line %d, %d in %s%n", diagnostic.getLineNumber(),diagnostic.getColumnNumber(), diagnostic.getSource().toUri());
                 }
                 fileManager.close();
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | SecurityException | IOException e) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | SecurityException | IOException
+                    | IllegalArgumentException | NoSuchMethodException e) {
                 e.printStackTrace();
             }
         }

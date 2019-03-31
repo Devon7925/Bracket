@@ -1,18 +1,20 @@
 package app.bcrt.compile;
 
+import java.util.Optional;
+
 public class Load extends Val {
     public Load(Val holder) {
-        super(holder, litToVal("execute"));
+        super(holder);
     }
 
-    public Val execute(Val context) {
+    @Override
+    public Optional<Val> execute() {
         String path = get(AppTool.litToVal("b")).asString();
-        Val loadedValue = Loader.loadFile(path, context);
-        Val result = new Val(context);
+        Val result = new Val(this);
+        Val loadedValue = Loader.loadFile(path, result);
         result.value.add(loadedValue);
-        result.holder = context;
         if(loadedValue != null) get(AppTool.litToVal("b")).set(result);
-        return result;
+        return Optional.of(result);
     }
 
     protected Load clone() {
