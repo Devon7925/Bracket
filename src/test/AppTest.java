@@ -17,7 +17,7 @@ import app.bcrt.compile.Val;
 public class AppTest {
     @Test
     public void testInterpretArgs() {
-        String[] args = {"-d", "0", "-d", "999", "path"};
+        String[] args = { "-d", "0", "-d", "999", "path" };
         assertEquals(App.interpretArgs(args), "path");
         assertEquals(App.debugLevel, 999);
     }

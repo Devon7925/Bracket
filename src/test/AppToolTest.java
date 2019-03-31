@@ -12,14 +12,15 @@ import app.bcrt.compile.AppTool;
 class AppToolTest {
     String test1 = "{1}, {2}, {3}";
     String test2 = "{1,,} {2,{3}} {3}";
+
     @Test
-    public void testIsList(){
+    public void testIsList() {
         assertEquals(AppTool.isList(test1), true);
         assertEquals(AppTool.isList(test2), false);
     }
-    
+
     @Test
-    public void testBaseIndex(){
+    public void testBaseIndex() {
         assertEquals(AppTool.baseIndex("{,,}fef{}aesf", ','), -1);
         assertEquals(AppTool.baseIndex("{}fef{}aesf", ','), -1);
         assertEquals(AppTool.baseIndex("{,,}fef{},aesf", ','), 9);
@@ -28,7 +29,7 @@ class AppToolTest {
     }
 
     @Test
-    public void testStringToElems(){
+    public void testStringToElems() {
         assertIterableEquals(AppTool.stringToElems(test1), Arrays.asList("{1}", " {2}", " {3}"));
         assertIterableEquals(AppTool.stringToElems(test2), Arrays.asList(test2));
     }
@@ -41,12 +42,12 @@ class AppToolTest {
 
     @Test
     public void testFileToString() {
-        assertEquals(AppTool.fileToString("src/test/AssignTest.bcrt"),"{'a'@{5}},{'a'@{6}}\\comment\\");
+        assertEquals(AppTool.fileToString("src/test/AssignTest.bcrt"), "{'a'@{5}},{'a'@{6}}\\comment\\");
     }
 
     @Test
     public void testGetCode() {
-        assertEquals(AppTool.getCode("src/test/AssignTest.bcrt"),"{'a'@{5}},{'a'@{6}}");
+        assertEquals(AppTool.getCode("src/test/AssignTest.bcrt"), "{'a'@{5}},{'a'@{6}}");
     }
 
     @Test

@@ -12,8 +12,7 @@ public class App extends AppTool {
         root = v;
         root.subAssign("load", new Load(root));
         root.execute();
-        if(debugLevel >= 1) 
-            root.subelems.entrySet().stream().map(n -> n.getKey()+" - "+n.getValue().toString()).forEach(System.out::println);
+        if(debugLevel >= 1) root.subelems.entrySet().stream().map(n -> n.getKey() + " - " + n.getValue().toString()).forEach(System.out::println);
     }
 
     public static void main(String[] args) throws IOException {
