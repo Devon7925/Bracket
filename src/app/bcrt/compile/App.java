@@ -1,88 +1,34 @@
 package app.bcrt.compile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-public class App {
+public class App extends AppTool {
 
-    public static final List<Var> vars = new ArrayList<>(Arrays.asList(new Var(AppTool.litToVal("execute"), new Load())));
-
+    public final Val root;
     public static int debugLevel = 0;
 
+    public App(Val v) {
+        root = v;
+        root.subAssign("load", new Load(root));
+        root.execute();
+        if(debugLevel >= 1) 
+            root.subelems.entrySet().stream().map(n -> n.getKey()+" - "+n.getValue().toString()).forEach(System.out::println);
+    }
+
     public static void main(String[] args) throws IOException {
-        Var root = new Var("root");
-        Loader.loadFile(interpretArgs(args), root).execute(root);
-        if(debugLevel >= 1) vars.forEach(System.out::println);
+        Val root = new Val(null);
+        root.set(Arrays.asList(Loader.loadFile(interpretArgs(args), root)));
+        new App(root);
     }
 
     public static String interpretArgs(String[] args) {
         for(int i = 0; i < args.length - 1; i++)
             if(args[i].equals("-d")) {
                 String debug = args[++i];
-                if(debug.matches("\\d+")) debugLevel = Integer.parseInt(debug);
+                if(isNumeric(debug)) debugLevel = Integer.parseInt(debug);
                 else throw new IllegalArgumentException("Debug level must be integer");
             }
         return args[args.length - 1];
-    }
-
-    static Val execute(String s, Val context) {
-        s = s.trim() + ";";
-        if(debugLevel >= 2) System.out.println(s);
-        Mode mode = Mode.START;
-        String current = "";
-        Val tempval = null;
-        int bracketlevel = 0;
-        for(char c : s.toCharArray()) {
-            switch(mode) {
-                case START:
-                    if(c == '{') bracketlevel++;
-                    if(c == '}') bracketlevel--;
-                    if(bracketlevel == 0) {
-                        if(c == '@') {
-                            tempval = context.interpret(current);
-                            current = "";
-                            mode = Mode.ASSIGN;
-                            break;
-                        } else if(c == ';') {
-                            tempval = context.interpret(current);
-                            if(tempval != null) {
-                                Val ret = tempval.execute(tempval instanceof Var ? tempval : context);
-                                if(ret != null) return ret;
-                            }
-                        } else if(c == '~') {
-                            current = "";
-                            mode = Mode.RETURN;
-                            break;
-                        }
-                    }
-                    break;
-                case ASSIGN:
-                    if(c == ';') {
-                        tempval.set(new Val(context.interpret(current)));
-                        if(tempval instanceof Var && tempval.holder == null) setVar((Var) tempval);
-                        return null;
-                    }
-                    break;
-                case RETURN:
-                    if(c == ';') return new Val(context.interpret(current));
-                    break;
-                default:
-                    System.err.println("Something very wrong happened");
-            }
-            current += c;
-        }
-        return null;
-    }
-
-    public static Var get(String name) {
-        return vars.stream().filter(n -> n.name.equals(name)).findAny().orElse(null);
-    }
-
-    public static void setVar(Var v) {
-        int index = vars.indexOf(get(v.name));
-        if(index == -1) vars.add(v); // if it does not already exist, add it
-        else vars.set(index, v); // otherwise set it
     }
 }

@@ -4,7 +4,7 @@
 }},
 {'flatten'@'execute'#{C:/Users/Public/eclipse-workspace/Bracket/methods/Flatten.java}},
 {'execute'#{C:/Users/Public/eclipse-workspace/Bracket/tests/base.bcrt}},
-{'path'@{C:/Users/Public/eclipse-workspace/Bracket/}},global path necessary for cmd execution
+{'path'@{C:/Users/Public/eclipse-workspace/Bracket/}},  global path necessary for cmd execution
 {'methpath'@'path'app{methods/}},
 {'print'@'execute'#'methpath'app{Print.java}},
 {'remove'@'execute'#'methpath'app{Remove.java}},
@@ -15,19 +15,21 @@
 {'execute'#'testpath'app{bit.bcrt}},
 {'execute'#'testpath'app{operations.bcrt}},
 {'execute'#'testpath'app{loop.bcrt}},
-{'b'@{3}},
-{'t'@{0}},
-{'b'.{i}@{0}},
-{'b'.{c}@{
-    {'b'['b'.{i}]@{0}}, 
-    {'b'.{i}@'inc'#('b'.{i})},
-    {'t'@'inc'#'t'}
+{'t'@{3}},
+{'t'.{i}@{0}},
+{'t'.{c}@{
+    {'t'['t'.{i}]@{0}}, 
+    {'t'.{i}@'inc'#('t'.{i})}
 }},
-{'b'.{d}@{~'b'['b'.{i}]}},
-{'whil'},
-{'b'['b'.{i}]@{1}},
-{'print'#'b'},
-{'print'#'t'},
-{'print'#'b'.{i}}
+{'t'.{d}@{~'t'['t'.{i}]}},
+{'n'@{
+    {'t'.{c}},
+    {'n'if{}condition{}}
+}},
+{'condition'@'t'.{d}},
+{'n'if{}condition{}},
+{'remove'#{condition}},
+{'t'['t'.{i}]@{1}},
+{'print'#('t')}
 \ ,{'execute'#'testpath'app{tests.bcrt}} \
-\ ,{'execute'#{tests/auxtests.bcrt}} \
+ \

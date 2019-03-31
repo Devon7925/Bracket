@@ -13,7 +13,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
-class Loader {
+public class Loader extends AppTool {
     public static Val loadFile(String path, Val context) {
         String[] splitByDot = path.split("\\.");
         if(splitByDot.length >= 2) {
@@ -30,8 +30,8 @@ class Loader {
     }
 
     public static Val loadBcrtMethod(String path, Val context) {
-        Val ret = context.interpret("{" + AppTool.getCode(path) + "}");
-        ret.holder = context.getVarHolder();
+        Val ret = context.interpret("{" + getCode(path) + "}");
+        ret.holder = context;
         return ret;
     }
 
@@ -56,7 +56,7 @@ class Loader {
                     classLoader.close();
                     if(newmethod instanceof Val) {
                         Val result = (Val) newmethod;
-                        result.holder = context.getVarHolder();
+                        if(context != null) result.holder = context;
                         return result;
                     } else throw new IllegalArgumentException("Improper format");
                 } else {
