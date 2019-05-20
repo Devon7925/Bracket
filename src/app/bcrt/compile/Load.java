@@ -2,22 +2,26 @@ package app.bcrt.compile;
 
 import java.util.Optional;
 
-public class Load extends Val {
+public class Load extends Value {
     public Load(Val holder) {
         super(holder);
     }
 
     @Override
-    public Optional<Val> execute() {
-        String path = get(AppTool.litToVal("b")).asString();
-        Val result = new Val(this);
-        Val loadedValue = Loader.loadFile(path, result);
-        result.value.add(loadedValue);
-        if(loadedValue != null) get(AppTool.litToVal("b")).set(result);
-        return Optional.of(result);
+    public Optional<Value> execute() {
+        String path = ((Val) holder.get(AppTool.litToVal("b"))).asString();
+        Value loadedValue = Loader.loadFile(path, holder);
+        if(loadedValue != null) holder.set(AppTool.litToVal("b"), loadedValue);
+        return Optional.of(loadedValue);
     }
 
-    protected Load clone() {
+    @Override
+    public Load clone() {
         return new Load(holder);
+    }
+
+    @Override
+    public int asInt() {
+        return 0;
     }
 }

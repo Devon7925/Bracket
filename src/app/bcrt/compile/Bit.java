@@ -1,6 +1,8 @@
 package app.bcrt.compile;
 
-class Bit extends Val {
+import java.util.Optional;
+
+class Bit extends Value {
 
     boolean bit;
 
@@ -13,32 +15,21 @@ class Bit extends Val {
         this.bit = bit;
     }
 
-    Bit(Val holder, Val v) {
-        super(holder);
-        set(v);
-    }
-
     @Override
-    int asInt() {
+    public int asInt() {
         return bit ? 1 : 0;
-    }
-
-    public void set(Val newval) {
-        bit = getBit(newval);
-        super.set(newval);
-    }
-
-    public static boolean getBit(Val val) {
-        return (val instanceof Bit) ? ((Bit) val).bit : getBit(val.get(0));
     }
 
     public String toString() {
         return bit ? "T" : "F";
     }
 
-    protected Bit clone() {
-        Bit clone = new Bit(holder, bit);
-        clone.set(this);
-        return clone;
+    public Bit clone() {
+        return new Bit(holder, bit);
+    }
+
+    @Override
+    public Optional<Value> execute() {
+        return Optional.empty();
     }
 }

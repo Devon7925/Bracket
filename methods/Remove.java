@@ -1,18 +1,18 @@
 import app.bcrt.compile.*;
 import java.util.Optional;
 
-public class Remove extends Val {
+public class Remove extends Value {
     public Remove(Val holder) {
         super(holder);
     }
 
     @Override
-    public Optional<Val> execute() {
-        get(litToVal("b")).holder.subelems.remove(get(litToVal("b")).toString());
+    public Optional<Value> execute() {
+        get(litToVal("b")).holder.remove(get(litToVal("b")).toString());
         return Optional.of(get(litToVal("b")));
     }
 
-    protected Val clone() {
+    public Val clone() {
         return new Remove(holder);
     }
 }

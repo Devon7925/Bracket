@@ -10,14 +10,13 @@ public class App extends AppTool {
 
     public App(Val v) {
         root = v;
-        root.subAssign(litToVal("load"), new Load(root));
+        root.put(litToVal("load"), new Load(root));
         root.execute();
-        if(debugLevel >= 1) root.subelems.entrySet().stream().map(n -> n.getKey() + " - " + n.getValue().toString()).forEach(System.out::println);
+        if(debugLevel >= 1) root.print();
     }
 
     public static void main(String[] args) throws IOException {
-        Val root = new Val(null);
-        root.set(Arrays.asList(Loader.loadFile(interpretArgs(args), root)));
+        Val root = new Val(null, Arrays.asList(Loader.loadBcrtMethod(interpretArgs(args))));
         new App(root);
     }
 

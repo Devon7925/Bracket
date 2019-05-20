@@ -3,20 +3,21 @@ package app.bcrt.compile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class Val extends AppTool implements Cloneable {
+public class Val extends Value implements Cloneable, Iterable<Value> {
 
-    public List<Val> value;
-    public Map<String, Val> subelems;
-    public Val holder;
+    protected List<Value> value;
+    protected Map<String, Value> subelems;
 
     public Val(Val holder) {
-        this.holder = holder;
-        set();
+        super(holder);
+        value = new ArrayList<>(0);
+        subelems = new HashMap<>(0);
     }
 
     public Val(Val holder, String newval) {
@@ -35,32 +36,27 @@ public class Val extends AppTool implements Cloneable {
         set(newval);
     }
 
-    public Val(Val holder, List<Val> value) {
+    public Val(Val holder, List<Value> value) {
         this(holder);
         set(value);
     }
 
-    public void set() {
-        value = new ArrayList<>(0);
-        subelems = new HashMap<>(0);
-    }
-
-    public void set(List<Val> value) {
+    private void set(List<Value> value) {
         value.forEach(n -> n.holder = this);
         this.value = value;
     }
 
-    public void set(String newval) {
+    private void set(String newval) {
         value = new ArrayList<>(newval.length());
         for(char c : newval.toCharArray())
             value.add(new Val(this, c, 8));
     }
 
-    public void set(int newval) {
+    private void set(int newval) {
         set(newval, (int) Math.floor(log(2, newval)) + 1);
     }
 
-    public void set(int newval, int minsize) {
+    private void set(int newval, int minsize) {
         if(newval == 0) {
             value = Arrays.asList(new Bit(this));
             return;
@@ -70,21 +66,16 @@ public class Val extends AppTool implements Cloneable {
             value.add(new Bit(this, (newval >> digit) % 2 == 1));
     }
 
-    public void set(Val newval) {
-        this.value = newval.value.stream().map(n -> n.clone()).map(n -> {n.holder = this; return n;}).collect(Collectors.toList());
-        this.subelems = newval.subelems.entrySet().stream().collect(Collectors.toMap(n -> n.getKey(), n -> {Val temp = n.getValue().clone(); temp.holder = this; return temp;}));
-    }
-
-    Val get(int index) {
+    Value get(int index) {
         if(index == value.size()) value.add(new Bit(this));
         return (index < value.size()) ? value.get(index) : new Bit(this);
     };
 
-    public Val get(String name) {
-        Val newvar = subelems.get(name);
+    public Value get(String name) {
+        Value newvar = subelems.get(name);
         if(newvar != null) return newvar;
 
-        Val extv = (holder == null) ? null : holder.get(name);
+        Value extv = (holder == null) ? null : holder.get(name);
 
         if(extv != null) return extv;
 
@@ -93,15 +84,61 @@ public class Val extends AppTool implements Cloneable {
         return v;
     }
 
-    public Val getLocal(String name) {
-        Val extv = subelems.get(name);
+    public void set(String name, Value newval) {
+        if(subelems.containsKey(name)) {
+            put(name, newval);
+            return;
+        }
+
+        if(holder != null) {
+            holder.set(name, newval);
+            return;
+        }
+
+        subelems.put(name, newval);
+    }
+
+    public void set(Value oldval, Value newval) {
+        top().setFromTop(oldval, newval);
+    }
+
+    private boolean setFromTop(Value oldval, Value newval) {
+        for(Map.Entry<String, Value> e : subelems.entrySet()) {
+            if(e.getValue().equals(oldval)) {
+                put(e.getKey(), newval);
+                return true;
+            }
+            if(e.getValue() instanceof Val && ((Val) e.getValue()).setFromTop(oldval, newval)) return true;
+        }
+        for(int i = 0; i < value.size(); i++) {
+            if(value.get(i).equals(oldval)) {
+                put(i, newval);
+                return true;
+            }
+            if(value.get(i) instanceof Val && ((Val) value.get(i)).setFromTop(oldval, newval)) return true;
+        }
+        return false;
+    }
+
+    private void put(int i, Value newval) {
+        newval.holder = this;
+        value.set(i, newval);
+    }
+
+    public void put(String name, Value newval) {
+        newval.holder = this;
+        subelems.put(name, newval);
+    }
+
+    public Value getLocal(String name) {
+        Value extv = subelems.get(name);
         if(extv != null) return extv;
         Val v = new Val(this);
-        subAssign(name, v);
+        put(name, v);
         return v;
     }
 
-    int asInt() {
+    public int asInt() {
         int result = 0;
         for(int i = 0; i < value.size(); i++)
             result += value.get(i).asInt() << i;
@@ -121,7 +158,7 @@ public class Val extends AppTool implements Cloneable {
     }
 
     public boolean isString() {
-        return value.stream().allMatch(n -> n.isChar());
+        return value.stream().allMatch(n -> n instanceof Val && ((Val) n).isChar());
     }
 
     public boolean isChar() {
@@ -135,23 +172,22 @@ public class Val extends AppTool implements Cloneable {
         return filteredval;
     }
 
-    public List<Val> elemsToVals(List<String> elems, Val holder) {
+    public List<Value> elemsToVals(List<String> elems, Val holder) {
         return elems.stream().map(this::interpret).map(n -> n.clone()).map(n -> {
             n.holder = holder;
             return n;
         }).collect(Collectors.toList());
     }
 
-    public Optional<Val> execute() {
+    public Optional<Value> execute() {
         return isString() ? execute(asString()) : value.stream().map(v -> v.execute()).filter(n -> n.isPresent()).map(n -> n.get()).findAny();
     }
 
-    Optional<Val> execute(String s) {
+    Optional<Value> execute(String s) {
         if(App.debugLevel >= 2) System.out.println(s);
         int index = baseIndex(s, '@');
         if(index >= 0) {
-            Val tempval = interpret(s.substring(0, index));
-            tempval.set(interpret(s.substring(index + 1)).clone());
+            set(interpret(s.substring(0, index)), interpret(s.substring(index + 1)).clone());
             return Optional.empty();
         }
         index = baseIndex(s, '~');
@@ -160,9 +196,9 @@ public class Val extends AppTool implements Cloneable {
         return interpret(s).execute();
     }
 
-    public Val interpret(String code) {
+    public Value interpret(String code) {
         code += ";";
-        Val result = new Val(this);
+        Value result = new Val(this);
         Mode mode = Mode.START;
         int bracketlevel = 0;
         String readString = "";
@@ -211,9 +247,9 @@ public class Val extends AppTool implements Cloneable {
                     break;
                 case INDEX: // read index acess
                     if(bracketlevel == 0) {
-                        if(isNumeric(readString)) result = result.get(Integer.parseInt(readString));
-                        else if(readString.contains(":")) result = result.filter(readString);
-                        else result = result.get(interpret(readString).asInt());
+                        if(isNumeric(readString)) result = ((Val) result).get(Integer.parseInt(readString));
+                        else if(readString.contains(":")) result = ((Val) result).filter(readString);
+                        else result = ((Val) result).get(interpret(readString).asInt());
                         readString = "";
                         mode = Mode.MODIFIER;
                         break;
@@ -230,12 +266,12 @@ public class Val extends AppTool implements Cloneable {
                     break;
                 case OP_ARG_2:// read second input and execute operation
                     if(c == ';') {
-                        Val argb = interpret(readString);
-                        if(operation.equals(litToVal("."))) result = result.getLocal(argb.toString());
+                        Value argb = interpret(readString);
+                        if(operation.equals(litToVal("."))) result = ((Val) result).getLocal(argb.toString());
                         else {
-                            Val op = get(operation).clone();
-                            op.subAssign(litToVal("a"), valRebase(op, result));
-                            op.subAssign(litToVal("b"), valRebase(op, argb));
+                            Val op = ((Val) get(operation)).clone();
+                            op.put(litToVal("a"), result);
+                            op.put(litToVal("b"), argb);
                             result = op.execute().get();
                         }
                     }
@@ -261,13 +297,21 @@ public class Val extends AppTool implements Cloneable {
         return holder.top();
     }
 
-    public void subAssign(String name, Val val) {
-        subelems.put(name, val);
+    @Override
+    public Val clone() {
+        Val clone = new Val(holder);
+        value.stream().map(n -> n.clone()).forEach(clone.value::add);
+        subelems.entrySet().forEach(n -> clone.subelems.put(n.getKey(), n.getValue().clone()));
+        ;
+        return clone;
     }
 
-    protected Val clone() {
-        Val clone = new Val(holder);
-        clone.set(this);
-        return clone;
+    public void print() {
+        subelems.entrySet().stream().map(n -> n.getKey() + " - " + n.getValue().toString()).forEach(System.out::println);
+    }
+
+    @Override
+    public Iterator<Value> iterator() {
+        return value.iterator();
     }
 }

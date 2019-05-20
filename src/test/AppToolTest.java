@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 
 import app.bcrt.compile.AppTool;
 
-class AppToolTest {
-    String test1 = "{1}, {2}, {3}";
-    String test2 = "{1,,} {2,{3}} {3}";
+public class AppToolTest {
+    static String test1 = "{1}, {2}, {3}";
+    static String test2 = "{1,,} {2,{3}} {3}";
 
     @Test
     public void testIsList() {
@@ -42,12 +42,14 @@ class AppToolTest {
 
     @Test
     public void testFileToString() {
-        assertEquals(AppTool.fileToString("src/test/AssignTest.bcrt"), "{'a'@{5}},{'a'@{6}}\\comment\\");
+        String s = System.getProperty("line.separator");
+        assertEquals(AppTool.fileToString("src/test/AssignTest.bcrt"), "{'a'@{5}},"+s+"{'a'@{6}},"+s+"{'b'@{{1},{0}}},"+s+"{'b'[1]@{1}}\\comment\\");
     }
 
     @Test
     public void testGetCode() {
-        assertEquals(AppTool.getCode("src/test/AssignTest.bcrt"), "{'a'@{5}},{'a'@{6}}");
+        String s = System.getProperty("line.separator");
+        assertEquals(AppTool.getCode("src/test/AssignTest.bcrt"), "{'a'@{5}},"+s+"{'a'@{6}},"+s+"{'b'@{{1},{0}}},"+s+"{'b'[1]@{1}}");
     }
 
     @Test

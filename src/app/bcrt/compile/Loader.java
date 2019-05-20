@@ -14,7 +14,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
 public class Loader extends AppTool {
-    public static Val loadFile(String path, Val context) {
+    public static Value loadFile(String path, Val context) {
         String[] splitByDot = path.split("\\.");
         if(splitByDot.length >= 2) {
             String extension = splitByDot[splitByDot.length - 1];
@@ -30,12 +30,16 @@ public class Loader extends AppTool {
     }
 
     public static Val loadBcrtMethod(String path, Val context) {
-        Val ret = context.interpret("{" + getCode(path) + "}");
+        Val ret = (Val) context.interpret("{" + getCode(path) + "}");
         ret.holder = context;
         return ret;
     }
 
-    public static Val loadJavaMethod(String path, Val context) {
+    public static Val loadBcrtMethod(String path) {
+        return ((Val) new Val(null).interpret("{" + getCode(path) + "}"));
+    }
+
+    public static Value loadJavaMethod(String path, Val context) {
         File newMeth = new File(path);
         File parent = newMeth.getParentFile();
         if(parent.exists() || parent.mkdirs()) {
@@ -54,8 +58,8 @@ public class Loader extends AppTool {
                     Object newmethod = classLoader.loadClass(name).getConstructor(Val.class).newInstance(context);
 
                     classLoader.close();
-                    if(newmethod instanceof Val) {
-                        Val result = (Val) newmethod;
+                    if(newmethod instanceof Value) {
+                        Value result = (Value) newmethod;
                         if(context != null) result.holder = context;
                         return result;
                     } else throw new IllegalArgumentException("Improper format");

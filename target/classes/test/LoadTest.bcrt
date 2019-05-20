@@ -1,0 +1,13 @@
+{'#'@{   use # for methods with only one input
+    {'a'},
+    {~'b'}
+}},
+{'flatten'@'load'#{C:/Users/Public/eclipse-workspace/Bracket/methods/Flatten.java}},
+{'app'@{~'flatten'#{'a', 'b'}}},   append two vals  
+{'path'@{C:/Users/Public/eclipse-workspace/Bracket/}},  global path necessary for cmd execution
+{'methpath'@'path'app{methods/}},
+{'print'@'load'#'methpath'app{Print.java}},
+{'remove'@'load'#'methpath'app{Remove.java}},
+{'input'@'load'#'methpath'app{Input.java}},
+{'a'@{1}},
+{'remove'#{a}}

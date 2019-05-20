@@ -8,25 +8,19 @@ import org.junit.jupiter.api.Test;
 
 import app.bcrt.compile.App;
 import app.bcrt.compile.AppTool;
-import app.bcrt.compile.Load;
 import app.bcrt.compile.Loader;
 import app.bcrt.compile.Val;
 
 /**
- * AppTest
+ * AssignTest
  */
-public class AppTest {
-    @Test
-    public void testInterpretArgs() {
-        String[] args = { "-d", "0", "-d", "999", "path" };
-        assertEquals(App.interpretArgs(args), "path");
-        assertEquals(App.debugLevel, 999);
-    }
+public class AssignTest {
 
     @Test
-    public void testConstructor() {
+    public void testAssign() {
         Val root = new Val(null, Arrays.asList(Loader.loadBcrtMethod("src/test/AssignTest.bcrt")));
         App app = new App(root);
-        assertEquals(app.root.get(AppTool.litToVal("load")).getClass(), Load.class);
+        assertEquals(app.root.get(AppTool.litToVal("a")).asInt(), 6);
+        assertEquals(app.root.get(AppTool.litToVal("b")).asInt(), 3);
     }
 }
