@@ -3,16 +3,11 @@
     {~'b'}
 }},
 {'flatten'@'load'#{C:/Users/Public/eclipse-workspace/Bracket/methods/Flatten.java}},
-{'load'#{C:/Users/Public/eclipse-workspace/Bracket/tests/base.bcrt}},
+{'app'@{~'flatten'#{'a', 'b'}}},   append two vals  
 {'path'@{C:/Users/Public/eclipse-workspace/Bracket/}},  global path necessary for cmd execution
 {'methpath'@'path'app{methods/}},
 {'print'@'load'#'methpath'app{Print.java}},
 {'remove'@'load'#'methpath'app{Remove.java}},
 {'input'@'load'#'methpath'app{Input.java}},
-{'testpath'@'path'app{tests/}},
-{'load'#'testpath'app{boolean.bcrt}},
-{'load'#'testpath'app{inequalities.bcrt}},
-{'load'#'testpath'app{bit.bcrt}},
-{'load'#'testpath'app{operations.bcrt}},
-{'load'#'testpath'app{loop.bcrt}},
-{'load'#'testpath'app{tests.bcrt}}
+{'a'@{1}},
+{'remove'#{a}}

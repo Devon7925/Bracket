@@ -1,26 +1,27 @@
 import app.bcrt.compile.*;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Optional;
 
-
-public class Flatten extends Val {
-    @Override
-    public Val execute(Val context){
-        Val ret = App.get("b");
-        int numvalue = 0;
-        for(int i = 0; i < ret.value.size(); i++){
-            numvalue += ret.value.get(i).value.size();
-        }
-        ArrayList<Val> flatvalue = new ArrayList<Val>(numvalue);
-        for(int i = 0; i < ret.value.size(); i++){
-            for(int j = 0; j < ret.value.get(i).value.size(); j++){
-                flatvalue.add(ret.value.get(i).value.get(j));
-            }
-        }
-        ret.value = flatvalue;
-        return ret;
+public class Flatten extends Value {
+    public Flatten(Val holder) {
+        super(holder);
     }
 
-    protected Val clone(){
-        return new Flatten();
+    @Override
+    public Optional<Value> execute() {
+        Val result = get(litToVal("b"));
+        int numberOfElems = result.stream().collect(Collectors.summingInt(n -> n.size()));
+        List<Value> flatenedvalue = new ArrayList<Val>(numberOfElems);
+        for(Value level1 : result)
+            if(level1 instanceof Val) ((Val) level1).forEach(flatenedvalue::add);
+        Val res = new Val(holder, flatenedvalue);
+        holder.set(litToVal("b"), res);
+        return Optional.of(res);
+    }
+
+    public Value clone() {
+        return new Flatten(holder);
     }
 }

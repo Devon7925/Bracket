@@ -1,246 +1,317 @@
 package app.bcrt.compile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class Val implements Cloneable {
+public class Val extends Value implements Cloneable, Iterable<Value> {
 
-    public ArrayList<Val> value;
-    ArrayList<Var> subelems = new ArrayList<>(0);
+    protected List<Value> value;
+    protected Map<String, Value> subelems;
 
-    public Val() {
-        set();
+    public Val(Val holder) {
+        super(holder);
+        value = new ArrayList<>(0);
+        subelems = new HashMap<>(0);
     }
 
-    public Val(String newval) {
-        if(newval.equals("")) set();
-        else if(newval.matches("\\d+")) set(Integer.parseInt(newval));
-        else set(newval);
+    public Val(Val holder, String newval) {
+        this(holder);
+        if(isNumeric(newval)) set(Integer.parseInt(newval));
+        else if(!newval.isEmpty()) set(newval);
     }
 
-    public Val(int newval) {
+    public Val(Val holder, int newval, int minsize) {
+        this(holder);
+        set(newval, minsize);
+    }
+
+    public Val(Val holder, int newval) {
+        this(holder);
         set(newval);
     }
 
-    public Val(Val newval) {
-        set(newval);
+    public Val(Val holder, List<Value> value) {
+        this(holder);
+        set(value);
     }
 
-    public Val(ArrayList<Val> value) {
+    private void set(List<Value> value) {
+        value.forEach(n -> n.holder = this);
         this.value = value;
     }
 
-    public void set() {
-        value = new ArrayList<>(0);
-    }
-
-    public void set(String newval) {
+    private void set(String newval) {
         value = new ArrayList<>(newval.length());
-        for(int i = 0; i < newval.length(); i++) {
-            int charval = newval.toCharArray()[i];
-            ArrayList<Val> character = new ArrayList<>(8);
-            for(int j = 0; j < 8; j++)
-                character.add(new Bit((charval >> j) % 2 == 1));
-            Val valchar = new Val();
-            valchar.value = character;
-            value.add(new Val(character));
-        }
+        for(char c : newval.toCharArray())
+            value.add(new Val(this, c, 8));
     }
 
-    public void set(int newval) {
+    private void set(int newval) {
+        set(newval, (int) Math.floor(log(2, newval)) + 1);
+    }
+
+    private void set(int newval, int minsize) {
         if(newval == 0) {
-            value = new ArrayList<Val>(1);
-            value.add(new Bit(false));
+            value = Arrays.asList(new Bit(this));
             return;
         }
-        int digits = (int) Math.floor(Math.log(newval) / Math.log(2)) + 1;
-        value = new ArrayList<>(digits);
-        for(int i = 0; i < digits; i++)
-            value.add(new Bit((newval >> i) % 2 == 1));
+        value = new ArrayList<>(minsize);
+        for(int digit = 0; digit < minsize; digit++)
+            value.add(new Bit(this, (newval >> digit) % 2 == 1));
     }
 
-    public void set(Bit newval) {
-        value = new ArrayList<Val>(1);
-        value.add(new Bit(newval));
-    }
-
-    public void set(Val newval) {
-        if(newval instanceof Bit) {
-            set((Bit) newval);
-            return;
-        }
-        this.value = new ArrayList<>(newval.value.size());
-        newval.value.stream().map(n -> n.clone()).forEach(value::add);
-        this.subelems = new ArrayList<>(newval.subelems.size());
-        newval.subelems.stream().map(n -> n.clone()).forEach(subelems::add);
-    }
-
-    Val get(int index) {
-        if(index < value.size()) return value.get(index);
-        else {
-            Val oobelem = new Bit(false);
-            if(index == value.size()) value.add(oobelem);
-            return oobelem;
-        }
+    Value get(int index) {
+        if(index == value.size()) value.add(new Bit(this));
+        return (index < value.size()) ? value.get(index) : new Bit(this);
     };
 
-    int interpretInt() {
-        int ret = 0;
-        for(int i = 0; i < value.size(); i++)
-            ret += value.get(i).interpretInt() << i;
-        return ret;
+    public Value get(String name) {
+        Value newvar = subelems.get(name);
+        if(newvar != null) return newvar;
+
+        Value extv = (holder == null) ? null : holder.get(name);
+
+        if(extv != null) return extv;
+
+        Val v = new Val(this);
+        subelems.put(name, v);
+        return v;
     }
 
-    public String interpretString() {
-        return value.stream().map(n -> (char) n.interpretInt()).collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
+    public void set(String name, Value newval) {
+        if(subelems.containsKey(name)) {
+            put(name, newval);
+            return;
+        }
+
+        if(holder != null) {
+            holder.set(name, newval);
+            return;
+        }
+
+        subelems.put(name, newval);
+    }
+
+    public void set(Value oldval, Value newval) {
+        top().setFromTop(oldval, newval);
+    }
+
+    private boolean setFromTop(Value oldval, Value newval) {
+        for(Map.Entry<String, Value> e : subelems.entrySet()) {
+            if(e.getValue().equals(oldval)) {
+                put(e.getKey(), newval);
+                return true;
+            }
+            if(e.getValue() instanceof Val && ((Val) e.getValue()).setFromTop(oldval, newval)) return true;
+        }
+        for(int i = 0; i < value.size(); i++) {
+            if(value.get(i).equals(oldval)) {
+                put(i, newval);
+                return true;
+            }
+            if(value.get(i) instanceof Val && ((Val) value.get(i)).setFromTop(oldval, newval)) return true;
+        }
+        return false;
+    }
+
+    private void put(int i, Value newval) {
+        newval.holder = this;
+        value.set(i, newval);
+    }
+
+    public void put(String name, Value newval) {
+        newval.holder = this;
+        subelems.put(name, newval);
+    }
+
+    public Value getLocal(String name) {
+        Value extv = subelems.get(name);
+        if(extv != null) return extv;
+        Val v = new Val(this);
+        put(name, v);
+        return v;
+    }
+
+    public int asInt() {
+        int result = 0;
+        for(int i = 0; i < value.size(); i++)
+            result += value.get(i).asInt() << i;
+        return result;
+    }
+
+    public String asString() {
+        return value.stream().map(n -> (char) n.asInt()).collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
     }
 
     public String toString() {
-        String ret = "{";
         if(value.size() > 0) {
-            if(value.get(0) instanceof Bit && value.size() > 2) ret += interpretInt();
-            else if(isString()) ret += interpretString();
+            if(value.get(0) instanceof Bit && value.size() > 2) return "{" + asInt() + "},";
+            else if(isString()) return "{" + asString() + "},";
         }
-        if(ret.length() == 1) for(Val v : value)
-            ret += v.toString() + ",";
-        return ret + "},";
+        return value.stream().map(v -> v.toString()).collect(Collectors.joining(",", "{", "},"));
     }
 
     public boolean isString() {
-        return value.get(0).value.size() == 8 && value.get(0).get(0) instanceof Bit;
+        return value.stream().allMatch(n -> n instanceof Val && ((Val) n).isChar());
     }
 
-    public Val execute(Val context) {
-        Val ret = null;
-        if(value.size() == 0 || isString()) {
-            return App.execute(interpretString(), context);
-        } else for(Val v1 : value) {
-            Val toret = v1.execute(context);
-            if(toret != null) ret = toret;
+    public boolean isChar() {
+        return value.size() == 8 && value.stream().allMatch(n -> n instanceof Bit);
+    }
+
+    public Val filter(String condition) {
+        Val filteredval = new Val(this);
+        for(int i = 0; i < value.size(); i++)
+            if(new Val(this, i).interpret(condition).asInt() == 1) filteredval.value.add(value.get(i).clone());
+        return filteredval;
+    }
+
+    public List<Value> elemsToVals(List<String> elems, Val holder) {
+        return elems.stream().map(this::interpret).map(n -> n.clone()).map(n -> {
+            n.holder = holder;
+            return n;
+        }).collect(Collectors.toList());
+    }
+
+    public Optional<Value> execute() {
+        return isString() ? execute(asString()) : value.stream().map(v -> v.execute()).filter(n -> n.isPresent()).map(n -> n.get()).findAny();
+    }
+
+    Optional<Value> execute(String s) {
+        if(App.debugLevel >= 2) System.out.println(s);
+        int index = baseIndex(s, '@');
+        if(index >= 0) {
+            set(interpret(s.substring(0, index)), interpret(s.substring(index + 1)).clone());
+            return Optional.empty();
         }
-        return ret;
+        index = baseIndex(s, '~');
+        if(index >= 0) return Optional.of(interpret(s.substring(index + 1)).clone());
+        if(s.isEmpty()) return Optional.empty();
+        return interpret(s).execute();
     }
 
-    public Val interpret(String s) {
-        s += ";";
-        Val ret = null;
+    public Value interpret(String code) {
+        code += ";";
+        Value result = new Val(this);
         Mode mode = Mode.START;
         int bracketlevel = 0;
-        String current = "";
+        String readString = "";
         String operation = "";
-        for(char c : s.toCharArray()) {
-            switch(c) {
-                case '{':
-                case '[':
-                case '(':
-                    bracketlevel++;
-                    break;
-                case '}':
-                case ']':
-                case ')':
-                    bracketlevel--;
-                    break;
-            }
+        for(char c : code.toCharArray()) {
+            if((c + "").matches("[\\[{(]")) bracketlevel++;
+            if((c + "").matches("[\\]})]")) bracketlevel--;
             switch(mode) {
                 case START:
                     if(c == '{') mode = Mode.VALUE;
                     else if(c == '\'') mode = Mode.VARIABLE;
                     else if(c == '(') mode = Mode.PARENTHESIS;
                     else if(c == ':') {
-                        ret = this;
+                        result = this;
+                        mode = Mode.MODIFIER;
+                    } else if(c == '`') {
+                        result = holder;
                         mode = Mode.MODIFIER;
                     }
                     break;
                 case VALUE:
                     if(bracketlevel == 0) {
-                        if(StringTool.isList(current)) {
-                            ret = new Val();
-                            ret.value = new ArrayList<>(
-                                    StringTool.stringToElems(current).stream().map(n -> interpret(n).clone()).collect(Collectors.toList()));
-                        } else ret = new Val(current);
-                        current = "";
+                        result = isList(readString) ? new Val(this, elemsToVals(stringToElems(readString), this)) : new Val(this, readString);
+                        readString = "";
                         mode = Mode.MODIFIER;
                     }
-                    current += c;
+                    readString += c;
                     break;
                 case VARIABLE:
                     if(c == '\'') {
-                        ret = App.get(current);
-                        if(ret == null) ret = new Var(current);
-                        current = "";
+                        result = get(litToVal(readString));
+                        readString = "";
                         mode = Mode.MODIFIER;
                         break;
                     }
-                    current += c;
+                    readString += c;
                     break;
                 case MODIFIER:// read what to do with ret
                     if(c == '[') {
-                        current = "";
+                        readString = "";
                         mode = Mode.INDEX;
                     } else {
-                        current = "" + c;
+                        readString = String.valueOf(c);
                         mode = Mode.OPERATION;
                     }
                     break;
                 case INDEX: // read index acess
                     if(bracketlevel == 0) {
-                        if(current.matches("\\d+")) ret = ret.get(Integer.parseInt(current));
-                        else if(current.contains(":")) {
-                            Val filteredval = new Val();
-                            for(int i = 0; i < ret.value.size(); i++)
-                                if(new Val(i).interpret(current).interpretInt() == 1) filteredval.value.add(ret.value.get(i).clone());
-                            ret = filteredval;
-                        } else ret = ret.get(interpret(current).interpretInt());
-                        current = "";
+                        if(isNumeric(readString)) result = ((Val) result).get(Integer.parseInt(readString));
+                        else if(readString.contains(":")) result = ((Val) result).filter(readString);
+                        else result = ((Val) result).get(interpret(readString).asInt());
+                        readString = "";
                         mode = Mode.MODIFIER;
                         break;
                     }
-                    current += c;
+                    readString += c;
                     break;
                 case OPERATION:// read operation
-                    if(c == '{' || c == '\'' || c == '(' || c == ':') {
-                        mode = Mode.INPUT2;
-                        operation = current;
-                        current = "";
+                    if(String.valueOf(c).matches("[{'(:]")) {
+                        mode = Mode.OP_ARG_2;
+                        operation = litToVal(readString);
+                        readString = "";
                     }
-                    current += c;
+                    readString += c;
                     break;
-                case INPUT2:// read second input and execute operation
+                case OP_ARG_2:// read second input and execute operation
                     if(c == ';') {
-                        Val tempb = interpret(current);
-                        if(operation.equals(".")) {
-                            ret = ((Var) ret).get(tempb.toString());
-                        } else {
-                            Var a = new Var("a");
-                            Var b = new Var("b");
-                            a.set(ret);
-                            b.set(tempb);
-                            Val v = App.get(operation);
-                            App.vars.add(0, a);
-                            App.vars.add(0, b);
-                            ret = v.execute(v);
-                            App.vars.remove(0);
-                            App.vars.remove(0);
+                        Value argb = interpret(readString);
+                        if(operation.equals(litToVal("."))) result = ((Val) result).getLocal(argb.toString());
+                        else {
+                            Val op = ((Val) get(operation)).clone();
+                            op.put(litToVal("a"), result);
+                            op.put(litToVal("b"), argb);
+                            result = op.execute().get();
                         }
                     }
-                    current += c;
+                    readString += c;
                     break;
                 case PARENTHESIS:// end paren
                     if(bracketlevel == 0) {
-                        ret = interpret(current);
-                        current = "";
+                        result = interpret(readString);
+                        readString = "";
                         mode = Mode.MODIFIER;
                     }
-                    current += c;
+                    readString += c;
                     break;
                 default:
                     System.err.println("Something very wrong happened");
             }
         }
-        return ret;
+        return result;
     }
 
-    protected Val clone() {
-        return new Val(this);
+    public Val top() {
+        if(holder == null) return this;
+        return holder.top();
+    }
+
+    @Override
+    public Val clone() {
+        Val clone = new Val(holder);
+        value.stream().map(n -> n.clone()).forEach(clone.value::add);
+        subelems.entrySet().forEach(n -> clone.subelems.put(n.getKey(), n.getValue().clone()));
+        ;
+        return clone;
+    }
+
+    public void print() {
+        subelems.entrySet().stream().map(n -> n.getKey() + " - " + n.getValue().toString()).forEach(System.out::println);
+    }
+
+    @Override
+    public Iterator<Value> iterator() {
+        return value.iterator();
     }
 }

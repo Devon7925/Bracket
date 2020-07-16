@@ -1,38 +1,35 @@
 package app.bcrt.compile;
 
-import java.util.ArrayList;
+import java.util.Optional;
 
-class Bit extends Val {
+class Bit extends Value {
 
-    boolean b;
+    boolean bit;
 
-    Bit(boolean b) {
-        this.b = b;
+    Bit(Val holder) {
+        this(holder, false);
     }
 
-    Bit(Val v) {
-        set(v);
+    Bit(Val holder, boolean bit) {
+        super(holder);
+        this.bit = bit;
     }
 
-    int interpretInt() {
-        return b ? 1 : 0;
-    }
-
-    public void set(Val newval) {
-        if(newval instanceof Bit) {
-            b = ((Bit) newval).b;
-            return;
-        }
-        this.b = ((Bit) newval.value.get(0)).b;
-        this.subelems = new ArrayList<>(newval.subelems.size());
-        newval.subelems.stream().map(n -> n.clone()).forEach(subelems::add);
+    @Override
+    public int asInt() {
+        return bit ? 1 : 0;
     }
 
     public String toString() {
-        return b ? "T" : "F";
+        return bit ? "T" : "F";
     }
 
-    protected Bit clone() {
-        return new Bit(this);
+    public Bit clone() {
+        return new Bit(holder, bit);
+    }
+
+    @Override
+    public Optional<Value> execute() {
+        return Optional.empty();
     }
 }

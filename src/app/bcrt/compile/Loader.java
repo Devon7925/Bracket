@@ -11,18 +11,18 @@ import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
-class Loader {
-    public static Val loadFile(String path, Val context) {
-        String[] split = path.split("\\.");
-        if(split.length >= 2) {
-            String extension = split[split.length - 1];
+
+public class Loader extends AppTool {
+    public static Value loadFile(String path, Val context) {
+        String[] splitByDot = path.split("\\.");
+        if(splitByDot.length >= 2) {
+            String extension = splitByDot[splitByDot.length - 1];
             switch(extension) {
                 case "bcrt":
                     return loadBcrtMethod(path, context);
                 case "java":
-                    return loadJavaMethod(path);
+                    return loadJavaMethod(path, context);
                 default:
                     throw new IllegalArgumentException("File type not recognized");
             }
@@ -30,36 +30,46 @@ class Loader {
     }
 
     public static Val loadBcrtMethod(String path, Val context) {
-        return context.interpret("{" + StringTool.getCode(path) + "}");
+        Val ret = (Val) context.interpret("{" + getCode(path) + "}");
+        ret.holder = context;
+        return ret;
     }
 
-    public static Val loadJavaMethod(String path) {
+    public static Val loadBcrtMethod(String path) {
+        return ((Val) new Val(null).interpret("{" + getCode(path) + "}"));
+    }
+
+    public static Value loadJavaMethod(String path, Val context) {
         File newMeth = new File(path);
-        if(newMeth.getParentFile().exists() || newMeth.getParentFile().mkdirs()) {
+        File parent = newMeth.getParentFile();
+        if(parent.exists() || parent.mkdirs()) {
             try {
                 // Compilation Requirements
-                DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
-                JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-                StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
+                var diagnostics = new DiagnosticCollector<JavaFileObject>();
+                var compiler = ToolProvider.getSystemJavaCompiler();
+                var fileManager = compiler.getStandardFileManager(diagnostics, null, null);
 
                 Iterable<? extends JavaFileObject> compilationUnit = fileManager.getJavaFileObjectsFromFiles(Arrays.asList(newMeth));
                 JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, compilationUnit);
                 if(task.call()) {
                     // Load and execute
-                    URLClassLoader classLoader = new URLClassLoader(new URL[] { newMeth.getParentFile().toURI().toURL() });
+                    var classLoader = new URLClassLoader(new URL[] { newMeth.getParentFile().toURI().toURL() });
                     String name = newMeth.getName().replaceAll("\\..*$", ""); // remove file extension
-                    Object newmethod = classLoader.loadClass(name).getConstructors()[0].newInstance();
+                    Object newmethod = classLoader.loadClass(name).getConstructor(Val.class).newInstance(context);
 
                     classLoader.close();
-                    if(newmethod instanceof Val) return (Val) newmethod;
-                    else throw new IllegalArgumentException("Improper format");
+                    if(newmethod instanceof Value) {
+                        Value result = (Value) newmethod;
+                        if(context != null) result.holder = context;
+                        return result;
+                    } else throw new IllegalArgumentException("Improper format");
                 } else {
-                    for(Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                        System.err.format("Error on line %d in %s%n", diagnostic.getLineNumber(), diagnostic.getSource().toUri());
-                    }
+                    for(Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics())
+                        System.err.format("Error on line %d, %d in %s%n", diagnostic.getLineNumber(),diagnostic.getColumnNumber(), diagnostic.getSource().toUri());
                 }
                 fileManager.close();
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | SecurityException | IOException e) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | SecurityException | IOException
+                    | IllegalArgumentException | NoSuchMethodException e) {
                 e.printStackTrace();
             }
         }

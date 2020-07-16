@@ -18,5 +18,17 @@
         }
     ],
     "java.configuration.updateBuildConfiguration": "automatic",
-    "java.format.settings.url": "eclipse-formatter.xml"
+    "java.format.settings.url": "eclipse-formatter.xml",
+    "search.usePCRE2": true,
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#000022",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "activityBarBadge.background": "#9f0000",
+        "activityBarBadge.foreground": "#e7e7e7",
+        "statusBar.background": "#000022",
+        "statusBarItem.hoverBackground": "#000055",
+        "statusBar.foreground": "#e7e7e7"
+    }
+
 }

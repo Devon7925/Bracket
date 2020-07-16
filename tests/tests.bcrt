@@ -4,6 +4,7 @@
     {:.{ret}@'a'[0]app{ - }app:.{ret}},
     {'print'#:.{ret}}
 }},
+{{{Dec              },{30} }check'dec'#{31}},
 {{{Addition         },{111}}check{101}+{10}},
 {{{Subtraction      },{91} }check{101}-{10}},
 {{{Multiplication   },{110}}check{11}*{10}},
