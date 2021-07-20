@@ -1,3 +1,4 @@
+Project is now deprecated, is broken and is not going to recieve any updates.
 # Bracket
 Bracket coding language is based off the idea to use very simple structures to allow full customization and high level use
 
